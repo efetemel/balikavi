@@ -1,8 +1,10 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:balikavi/controllers/MainController.dart';
 import 'package:balikavi/controllers/UserController.dart';
+import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/utils/AppUtils.dart';
 import 'package:balikavi/views/ProfileView.dart';
+import 'package:balikavi/views/SettingsView.dart';
 import 'package:balikavi/views/SignInView.dart';
 import 'package:balikavi/views/WeatherView.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,20 +35,25 @@ class HomeView extends StatelessWidget {
   }
 
   Widget initializePage(){
-    switch(MainController.instance.homeTabIndex.value){
-      case 0:
-        return Column(children: [Text(MainController.instance.myPosition.value.latitude.toString())],);
-      case 1:
-        return WeatherView();
-      case 2:
-        return Column();
-      case 3:
-        return Column();
-      case 4:
-        return profilePage();
-      default:
-        return Container();
+    if(WeatherController.instance.weatherModelGfs.value.tempSurface != null){
+      switch(MainController.instance.homeTabIndex.value){
+        case 0:
+          return Container(child: Text("Fish"),);
+        case 1:
+          return WeatherView();
+        case 2:
+          return Column();
+        case 3:
+          return SettingsView();
+        case 4:
+          return profilePage();
+        default:
+          return Container();
+      }
+    }else{
+      return Container(alignment: Alignment.center,width: double.infinity,child: CircularProgressIndicator(),);
     }
+
   }
 
   StatelessWidget profilePage(){

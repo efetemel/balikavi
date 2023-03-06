@@ -7,6 +7,8 @@ import 'package:line_icons/line_icons.dart';
 class AppUtils{
   static var appName = "Balık Avı";
   static var appLanguageShort = "tr";
+  static var kelvinToCelsius = 273.15;
+  static var celsiusIconText = "°c";
   static var bottomIcons = [LineIcons.fish,Icons.sunny,Icons.search,Icons.settings,Icons.person];
   static var theme = ThemeData.dark().copyWith(useMaterial3: true,scaffoldBackgroundColor: const Color.fromRGBO(28, 28, 28, 1));
 
