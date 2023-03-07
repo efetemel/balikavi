@@ -4,6 +4,8 @@ import 'package:balikavi/utils/AppUtils.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
 
@@ -12,26 +14,17 @@ class WeatherView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    const String link = "https://i.hizliresim.com/3a5d5gi.png";
-    const String countryName = "İstanbul";
+    const String link = "https://i.hizliresim.com/42n6z1e.png"; // Siyah
+    //const String link = "https://i.hizliresim.com/3a5d5gi.png"; // Beyaz
+    var mounths = [];
 
-    var days = [];
-
-
-     /*if(WeatherController.instance.weatherModelGfs.value.tempSurface != null){
-        for (var i = 0; i < WeatherController.instance.weatherModelGfs.value.tempSurface!.length.toInt(); i++) {
-          double celsius = (WeatherController.instance.weatherModelGfs.value.tempSurface![i] - 273.15);
-          print("Derece : ${celsius.floorToDouble()}, Zaman : ${Jiffy(DateTime.fromMillisecondsSinceEpoch(WeatherController.instance.weatherModelGfs.value.ts![i])).yMMMMdjm}");
-          print("DewPoint : "+WeatherController.instance.weatherModelGfs.value.dewpointSurface![i].toString());
-        }
-      }*/
-
-    double celsius = WeatherController.instance.weatherModelGfs.value.tempSurface![0] - AppUtils.kelvinToCelsius;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        elevation: 0.0,
+        leading: IconButton(icon: Icon(Icons.menu),onPressed: (){}),
       ),
       body:Container(
         width: double.infinity,
@@ -45,33 +38,46 @@ class WeatherView extends StatelessWidget {
         child:Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Column(
-              children: [
-                Text(countryName,style: TextStyle(fontSize: 35,fontWeight: FontWeight.bold)),
-                Text(celsius.floor().toString()+AppUtils.celsiusIconText,style: TextStyle(fontSize: 80)),
-                Text("Güneşli",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)
-              ],
+            Container(
+              height: 200,
+              alignment: Alignment.center,
+              child: Text("Hava Durumu",style: TextStyle(fontSize: 40),),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 20,vertical: 20),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(color: Colors.grey),
-                  color: const Color.fromRGBO(52, 52, 52, 0.3)
+                  border: Border.all(color: Color.fromRGBO(52, 52, 52, 0.6)),
+                  color: Color.fromRGBO(52, 52, 52, 1)
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Hava durumu 3 saat aralıklarla belirlenir."),
-                  Text("Bugün ve yarının saatlik bilgisi."),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 1,
-                    color: Colors.grey,
+                  Text(MainController.instance.placeData.value.street!,style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(Jiffy(DateTime.now()).yMMMMdjm.toString(),style: TextStyle(color: Colors.grey),),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.cloudy_snowing,size: 48),
+                          Text("10"+AppUtils.celsiusIconText,style: TextStyle(fontSize: 40),)
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text("Ligth Rain Shower",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
+                          Text("13"+AppUtils.celsiusIconText,style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
+                          Text("Feels like 8"+AppUtils.celsiusIconText,style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
+                        ],
+                      )
+                    ],
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -82,77 +88,77 @@ class WeatherView extends StatelessWidget {
               ),
             ),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
-              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+              margin: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  border: Border.all(color: Colors.grey),
-                  color: const Color.fromRGBO(52, 52, 52, 0.3)
+                  border: Border.all(color: Color.fromRGBO(52, 52, 52, 0.6)),
+                  color: Color.fromRGBO(52, 52, 52, 1)
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.calendar_month),
-                      SizedBox(width: 5),
-                      Text("10 - GÜNLÜK HAVA DURUMU")
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    width: double.infinity,
-                    height: 1,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 10),
-                  SingleChildScrollView(
-                    child: Container(
-                      width: double.infinity,
-                      height: 150,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: WeatherController.instance.weatherModelGfs.value.ts!.length,
-                        itemBuilder: (_,int pos){
-                          var weatherDateTime = DateTime.fromMillisecondsSinceEpoch(WeatherController.instance.weatherModelGfs.value.ts![pos]);
-                          var dateTimeNow = DateTime.now();
-                          if(!days.contains(Jiffy(weatherDateTime).EEEE)){
-                            double _celsius = WeatherController.instance.weatherModelGfs.value.tempSurface![pos] - AppUtils.kelvinToCelsius;
-                            days.add(Jiffy(weatherDateTime).EEEE.toString());
-                            var dayName = "";
-                            if(weatherDateTime.day == dateTimeNow.day){
-                              dayName = "Bugün";
-                            }
-                            else if(weatherDateTime.day < dateTimeNow.day){
-                              dayName = "Dün";
-                            }
-                            else {
-                              dayName =  Jiffy(weatherDateTime).EEEE;
-                            }
-                            return ListTile(
-                              title: Container(
-                                width: double.infinity,
+              child: SingleChildScrollView(
+                child: Container(
+                  width: double.infinity,
+                  height: 180,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: WeatherController.instance.weatherModelGfs.value.ts!.length,
+                    itemBuilder: (_,int pos){
+                      var weatherDateTime = DateTime.fromMillisecondsSinceEpoch(WeatherController.instance.weatherModelGfs.value.ts![pos]);
+                      var dateTimeNow = DateTime.now();
+                      if(!mounths.contains(Jiffy(weatherDateTime).yMMMMd)){
+                        double _celsius = WeatherController.instance.weatherModelGfs.value.tempSurface![pos] - AppUtils.kelvinToCelsius;
+                        mounths.add(Jiffy(weatherDateTime).yMMMMd.toString());
+                        var dayName = "";
+                        if(weatherDateTime.day == dateTimeNow.day){
+                          dayName = "Bugün";
+                        }
+                        else if(weatherDateTime.day < dateTimeNow.day){
+                          dayName = "Dün";
+                        }
+                        else {
+                          dayName =  Jiffy(weatherDateTime).EEEE;
+                        }
+                        return Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                          child:  Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                width:70,
+                                child: Text(dayName,style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                              Container(
+                                alignment: Alignment.center,
                                 child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(dayName),
+                                    Icon(Icons.water_drop,size: 12,),
+                                    SizedBox(width: 3),
+                                    Text("30%",style: TextStyle(color: Colors.grey),),
+                                    SizedBox(width: 3),
+                                    Icon(Icons.cloudy_snowing,size: 20,),
+                                    SizedBox(width: 3),
+                                    Icon(Icons.cloudy_snowing,size: 20,),
                                   ],
                                 ),
                               ),
-                              trailing: Text(_celsius.floor().toString()+AppUtils.celsiusIconText,style: TextStyle(fontWeight: FontWeight.bold),),
-                            );
-                          }
-                          else{
-                            return Container();
-                          }
-                        },
-                      ),
-                    ),
-                  )
-                ],
+                              Container(
+                                width: 30,
+                                child:  Text(_celsius.floor().toString()+AppUtils.celsiusIconText,style: TextStyle(fontWeight: FontWeight.bold),),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      else{
+                        return Container();
+                      }
+                    },
+                  ),
+                ),
               ),
-            ),
+            )
           ],
         ),
       )
@@ -170,11 +176,18 @@ class WeatherView extends StatelessWidget {
           margin: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
-              Text(Jiffy(DateTime.fromMillisecondsSinceEpoch(WeatherController.instance.weatherModelGfs.value.ts![i])).jm.toString(),style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(Jiffy(DateTime.fromMillisecondsSinceEpoch(WeatherController.instance.weatherModelGfs.value.ts![i])).jm.toString(),style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w500)),
               SizedBox(height: 5),
               Icon(Icons.cloudy_snowing),
               SizedBox(height: 5),
-              Text(celsius.floor().toString()+AppUtils.celsiusIconText,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+              Text(celsius.floor().toString()+AppUtils.celsiusIconText,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16),),
+              Row(
+                children: [
+                  Icon(Icons.water_drop,size: 12,),
+                  SizedBox(width: 3),
+                  Text("30%",style: TextStyle(color: Colors.grey),)
+                ],
+              )
             ],
           ),
         ));
@@ -185,5 +198,7 @@ class WeatherView extends StatelessWidget {
     }
     return x;
   }
+
+
 
 }

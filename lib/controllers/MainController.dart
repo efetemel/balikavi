@@ -2,6 +2,7 @@ import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/views/HomeView.dart';
 import 'package:balikavi/views/WelcomeView.dart';
 import 'package:dio/dio.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -30,9 +31,12 @@ class MainController extends GetxController {
       isMocked: true
   ).obs;
 
+  var placeData = Placemark().obs;
+
 
   MainController() {
     readSettings();
+    getAddressFromLatLong(myPosition.value);
     determinePosition().then((_){
     });
   }
@@ -105,5 +109,13 @@ class MainController extends GetxController {
     // continue accessing the position of the device.
     locationPerm.value = true;
     myPosition.value =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    getAddressFromLatLong(myPosition.value);
+  }
+
+  Future<void> getAddressFromLatLong(Position position)async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+    //var address = '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    placeData.value = place!;
   }
 }

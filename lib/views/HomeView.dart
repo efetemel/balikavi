@@ -29,6 +29,7 @@ class HomeView extends StatelessWidget {
         inactiveColor: Colors.white54,
         gapLocation: GapLocation.none,
         backgroundColor: Colors.transparent,
+        elevation: 0.0,
         onTap: (index){MainController.instance.homeTabIndex.value = index;},
       )),
     );
