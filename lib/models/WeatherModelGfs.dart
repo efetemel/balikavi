@@ -15,12 +15,12 @@ class WeatherModelGfs {
   List<dynamic>? tempSurface;
   List<dynamic>? temp800h;
   List<dynamic>? temp300h;
-  List<int>? past3hprecipSurface;
-  List<int>? past3hconvprecipSurface;
+  List<dynamic>? past3hprecipSurface;
+  List<dynamic>? past3hconvprecipSurface;
   List<dynamic>? lcloudsSurface;
-  List<int>? mcloudsSurface;
-  List<int>? hcloudsSurface;
-  List<int>? ptypeSurface;
+  List<dynamic>? mcloudsSurface;
+  List<dynamic>? hcloudsSurface;
+  List<dynamic>? ptypeSurface;
   List<dynamic>? capeSurface;
   List<dynamic>? rhSurface;
   List<dynamic>? rh800h;

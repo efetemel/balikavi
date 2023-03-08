@@ -18,9 +18,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children:[ Expanded(child: Obx(()=>initializePage()))],
-      ),
+      body: Obx(()=>initializePage()),
       extendBody: true,
       bottomNavigationBar: Obx(()=> AnimatedBottomNavigationBar(
         icons: AppUtils.bottomIcons,
@@ -28,8 +26,8 @@ class HomeView extends StatelessWidget {
         splashColor: Colors.grey,
         inactiveColor: Colors.white54,
         gapLocation: GapLocation.none,
-        backgroundColor: Colors.transparent,
         elevation: 0.0,
+        backgroundColor: MainController.instance.appTheme.value.bottomNavColor!,
         onTap: (index){MainController.instance.homeTabIndex.value = index;},
       )),
     );

@@ -20,7 +20,7 @@ class WeatherController extends GetxController{
   }
 
   Future getWeatherData()async{
-    if(firstRequest.value || requestDate.value.hour != DateTime.now().hour){
+    if(firstRequest.value || requestDate.value.add(Duration(minutes: 30)) == DateTime.now()){
       firstRequest.value = false;
       var baseData = {
         "key": Links.weatherApiKey,
@@ -41,7 +41,15 @@ class WeatherController extends GetxController{
           "dewpoint",
           "pressure",
           "temp",
-          "rh"
+          "precip",
+          "convPrecip",
+          "lclouds",
+          "mclouds",
+          "hclouds",
+          "ptype",
+          "cape",
+          "rh",
+          "gh"
         ]
       };
       var dataGfsWave = {
@@ -54,12 +62,13 @@ class WeatherController extends GetxController{
           "swell2"
         ]
       };
+
       try{
         var responseGfs = await MainController.instance.dio.post(Links.weatherApi,data: dataGfs);
         var responseGfsWave = await MainController.instance.dio.post(Links.weatherApi,data: dataGfsWave);
         weatherModelGfs.value = WeatherModelGfs.fromJson(responseGfs.data);
         weatherModelGfs.refresh();
-        requestDate = DateTime.now().obs;
+        requestDate.value = DateTime.now();
       }catch(err){
         if(err is DioError){
           AppUtils.showNotification("Sistem bilgisi", "Konum veya İnternet açık değil!");
@@ -67,7 +76,7 @@ class WeatherController extends GetxController{
       }
     }
     else{
-      // 1 SAAT SONRA GEL
+      // 30 DAKİKA SONRA GEL
     }
   }
 
