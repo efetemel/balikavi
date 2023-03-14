@@ -4,6 +4,7 @@ import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/utils/AppUtils.dart';
 import 'package:balikavi/views/ProfileView.dart';
+import 'package:balikavi/views/SearchView.dart';
 import 'package:balikavi/views/SettingsView.dart';
 import 'package:balikavi/views/SignInView.dart';
 import 'package:balikavi/views/WeatherView.dart';
@@ -27,21 +28,21 @@ class HomeView extends StatelessWidget {
         inactiveColor: Colors.white54,
         gapLocation: GapLocation.none,
         elevation: 0.0,
-        backgroundColor: MainController.instance.appTheme.value.bottomNavColor!,
+        backgroundColor: AppUtils.bottomNavNightColor!,
         onTap: (index){MainController.instance.homeTabIndex.value = index;},
       )),
     );
   }
 
   Widget initializePage(){
-    if(WeatherController.instance.weatherModelGfs.value.tempSurface != null){
+    if(MainController.instance.appSettings.value.positions != null){
       switch(MainController.instance.homeTabIndex.value){
         case 0:
           return Container(child: Text("Fish"),);
         case 1:
           return WeatherView();
         case 2:
-          return Column();
+          return SearchView();
         case 3:
           return SettingsView();
         case 4:

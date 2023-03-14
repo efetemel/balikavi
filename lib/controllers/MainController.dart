@@ -1,6 +1,6 @@
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
-import 'package:balikavi/models/AppThemeModel.dart';
+import 'package:balikavi/models/PositionsModel.dart';
 import 'package:balikavi/views/HomeView.dart';
 import 'package:balikavi/views/WelcomeView.dart';
 import 'package:dio/dio.dart';
@@ -20,7 +20,8 @@ class MainController extends GetxController {
   var homeTabIndex = 0.obs;
   var locationPerm = false.obs;
   var placeData = Placemark().obs;
-  var appTheme = AppUtils.dayTheme.obs;
+
+  var placesData = <Placemark>[].obs;
 
   var myPosition = Position(
       accuracy: 0,
@@ -36,19 +37,8 @@ class MainController extends GetxController {
   ).obs;
 
   MainController() {
-    appTheme.value = AppUtils.getTheme();
     readSettings();
-    getAddressFromLatLong(myPosition.value);
     determinePosition().then((_){});
-  }
-
-  Future setToken(String token)async{
-    appSettings.value.token = token;
-    await settingsBox.write("app_settings", appSettings.toJson());
-  }
-
-  Future clearToken()async{
-    await settingsBox.write("token", null);
   }
 
   Future readSettings() async{
@@ -60,10 +50,37 @@ class MainController extends GetxController {
         dio.options = BaseOptions(headers: {"Authorization":appSettings.value.token});
         await UserController.instance.getSettings();
       }
+      for (var element in appSettings.value.positions!) {
+        getAddressFromLatLong(element);
+      }
     }else{
-      appSettings.value = AppSettings(firstOpen: false,token: null);
+      var posModel =  PositionsModel.fromJson({
+        "latitude":myPosition.value.latitude,
+        "longitude":myPosition.value.longitude
+      });
+      appSettings.value = AppSettings(
+          firstOpen: false,
+          token: null,
+          positions:[posModel]
+      );
+      appSettings.refresh();
+      getAddressFromLatLong(posModel);
       await settingsBox.write("app_settings", appSettings.toJson());
     }
+    await WeatherController.instance.getWeatherData();
+  }
+
+  Future setToken(String token)async{
+    appSettings.value.token = token;
+    await settingsBox.write("app_settings", appSettings.toJson());
+  }
+
+  Future clearToken()async{
+    await settingsBox.write("token", null);
+  }
+  
+  Future setSettings()async{
+    await settingsBox.write("app_settings", appSettings.toJson());
   }
 
   Future determinePosition() async {
@@ -94,14 +111,19 @@ class MainController extends GetxController {
 
     locationPerm.value = true;
     myPosition.value =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    getAddressFromLatLong(myPosition.value);
-    await WeatherController.instance.getWeatherData();
-
+    var posModel = PositionsModel(longitude: myPosition.value.longitude,latitude: myPosition.value.latitude);
+    if(appSettings.value.positions!.where((element) => element == posModel) == null){
+      appSettings.value.positions!.add(posModel);
+      getAddressFromLatLong(posModel);
+      await WeatherController.instance.getWeatherData();
+    }
   }
 
-  Future<void> getAddressFromLatLong(Position position)async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+  Future<void> getAddressFromLatLong(PositionsModel position)async {
+    print("Latitude: ${position.latitude} / Longitude: ${position.longitude}");
+    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
     Placemark place = placemarks[0];
-    placeData.value = place!;
+    placesData.value.add(place);
+    placesData.refresh();
   }
 }
