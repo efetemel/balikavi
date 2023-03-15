@@ -25,7 +25,6 @@ class WeatherController extends GetxController{
 
   Future getWeatherData()async{
     try{
-      print("çağrıyorum");
       weatherModelGfs.clear();
       for (var element in MainController.instance.appSettings.value.positions!) {
         var baseData = {
@@ -75,8 +74,8 @@ class WeatherController extends GetxController{
         weatherModelGfs.refresh();
       }
       requestDate.value = DateTime.now();
+      MainController.instance.loadData.value = true;
     }catch(err){
-      print(err);
       if(err is DioError){
         AppUtils.showNotification("Sistem bilgisi", "Konum veya İnternet açık değil!");
       }

@@ -35,7 +35,7 @@ class HomeView extends StatelessWidget {
   }
 
   Widget initializePage(){
-    if(MainController.instance.appSettings.value.positions != null){
+    if(MainController.instance.loadData.value){
       switch(MainController.instance.homeTabIndex.value){
         case 0:
           return Container(child: Text("Fish"),);

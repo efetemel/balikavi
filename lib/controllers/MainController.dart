@@ -19,7 +19,8 @@ class MainController extends GetxController {
   var appSettings = AppSettings().obs;
   var homeTabIndex = 0.obs;
   var locationPerm = false.obs;
-  var placeData = Placemark().obs;
+
+  var loadData = false.obs;
 
   var placesData = <Placemark>[].obs;
 
@@ -120,7 +121,6 @@ class MainController extends GetxController {
   }
 
   Future<void> getAddressFromLatLong(PositionsModel position)async {
-    print("Latitude: ${position.latitude} / Longitude: ${position.longitude}");
     List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
     Placemark place = placemarks[0];
     placesData.value.add(place);

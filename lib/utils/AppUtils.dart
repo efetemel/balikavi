@@ -17,7 +17,12 @@ class AppUtils{
   static var bottomIcons = [LineIcons.fish,Icons.sunny,Icons.search,Icons.settings,Icons.person];
   static const boxNightColor = Color.fromRGBO(52, 52, 52, 1);
   static const bottomNavNightColor = Color.fromRGBO(0, 0, 0, 0.45);
-  static const nightBgLink = "https://i.hizliresim.com/42n6z1e.png";
+  static const bgDecoration = BoxDecoration(
+    image: DecorationImage(
+        image: AssetImage("assets/images/bg.jpg"),
+        fit: BoxFit.cover
+    ),
+  );
   static final Random _rnd = Random.secure();
   static const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
 
