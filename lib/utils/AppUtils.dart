@@ -78,6 +78,24 @@ class AppUtils{
     }
     return response / todayWeathers.length;
   }
+  
+  static int xtodayLastHumidity(WeatherModelGfs weatherModelGfs,int pos) {
+    var todayWeathers = <double>[];
+    var response = 0.0;
+    var time = [];
+    for (int i = 0; i <
+        weatherModelGfs.rhSurface!
+            .length; i++) {
+      var date = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![pos]);
+      todayWeathers.add(weatherModelGfs.rhSurface![pos]);
+
+    }
+    for (var element in todayWeathers) {
+      response += element;
+    }
+    return (response / todayWeathers.length).toInt();
+    //BURDA KALDIN "(
+  }
 
   static List<double> todayFirstAndLastForecast(WeatherModelGfs weatherModelGfs) {
     var todayWeathers = <double>[];
@@ -92,6 +110,7 @@ class AppUtils{
     }
     return [todayWeathers.first,todayWeathers.last];
   }
+
 
   static List<Widget> hoursWeatherWidgets(WeatherModelGfs weatherModelGfs){
     List<Widget> x = [];
