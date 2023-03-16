@@ -14,6 +14,8 @@ class WeatherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     var weatherController = WeatherController.instance;
     var mainController = MainController.instance;
+    var weatherModel = WeatherController.instance.weatherModelGfs.value.reversed.toList()[pos];
+    var placesData = MainController.instance.placesData.value.reversed.toList()[pos];
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
@@ -25,7 +27,7 @@ class WeatherCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("${mainController.placesData.value[pos].subLocality!} / ${mainController.placesData.value[pos].administrativeArea!}",style: TextStyle(fontWeight: FontWeight.bold),),
+          Text("${placesData.subLocality!} / ${placesData.administrativeArea!}",style: TextStyle(fontWeight: FontWeight.bold),),
           Text(Jiffy(weatherController.requestDate.value).yMMMMdjm.toString(),style: TextStyle(color: Colors.grey),),
           const SizedBox(height: 10),
           Row(
@@ -33,16 +35,16 @@ class WeatherCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  AppUtils.getTypeWeather(weatherController.weatherModelGfs.value[pos].ptypeSurface!.last),
+                  AppUtils.getTypeWeather(weatherModel.ptypeSurface!.last),
                   const SizedBox(width: 10),
-                  Text(AppUtils.getCelsiusText(AppUtils.todayLastForecast(weatherController.weatherModelGfs.value[pos])),style: TextStyle(fontSize: 40),)
+                  Text(AppUtils.getCelsiusText(AppUtils.todayLastForecast(weatherModel)),style: TextStyle(fontSize: 40),)
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text("${AppUtils.getCelsiusText(AppUtils.todayFirstAndLastForecast(weatherController.weatherModelGfs.value[pos]).first)} / ${AppUtils.getCelsiusText(AppUtils.todayFirstAndLastForecast(weatherController.weatherModelGfs.value[pos]).last)}",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
-                  Text("Hissedilen Sıcaklık: ${weatherController.getFeelsLikeTemperature(AppUtils.todayLastForecast(weatherController.weatherModelGfs.value[pos]), AppUtils.todayLastHumidity(weatherController.weatherModelGfs.value[pos]))}${AppUtils.celsiusIconText}",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
+                  Text("${AppUtils.getCelsiusText(AppUtils.todayFirstAndLastForecast(weatherModel).first)} / ${AppUtils.getCelsiusText(AppUtils.todayFirstAndLastForecast(weatherModel).last)}",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
+                  Text("Hissedilen Sıcaklık: ${weatherController.getFeelsLikeTemperature(AppUtils.todayLastForecast(weatherModel), AppUtils.todayLastHumidity(weatherModel))}${AppUtils.celsiusIconText}",style: TextStyle(fontSize: 13,fontWeight: FontWeight.w500,color: Colors.grey),),
                 ],
               )
             ],
@@ -51,7 +53,7 @@ class WeatherCard extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: AppUtils.hoursWeatherWidgets(weatherController.weatherModelGfs.value[pos]),
+              children: AppUtils.hoursWeatherWidgets(weatherModel),
             ),
           )
         ],

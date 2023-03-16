@@ -19,6 +19,9 @@ class SearchView extends StatelessWidget {
   Widget build(BuildContext context) {
     print(MainController.instance.appSettings.value.positions!.length);
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Konum Ara"),
+      ),
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -72,6 +75,7 @@ class SearchView extends StatelessWidget {
                             "longitude":lng
                           }
                         );
+                        searchTextController.clear();
                         WeatherController.instance.addDBLatLong(psModel);
                       },
                     );

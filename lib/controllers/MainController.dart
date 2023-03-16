@@ -4,6 +4,8 @@ import 'package:balikavi/models/PositionsModel.dart';
 import 'package:balikavi/views/HomeView.dart';
 import 'package:balikavi/views/WelcomeView.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -19,6 +21,9 @@ class MainController extends GetxController {
   var appSettings = AppSettings().obs;
   var homeTabIndex = 0.obs;
   var locationPerm = false.obs;
+  final scaffoldKey = GlobalKey<ScaffoldState>().obs;
+
+  var mainText = "Hava Durumu".obs;
 
   var loadData = false.obs;
 
@@ -80,9 +85,7 @@ class MainController extends GetxController {
     await settingsBox.write("token", null);
   }
   
-  Future setSettings()async{
-    await settingsBox.write("app_settings", appSettings.toJson());
-  }
+
 
   Future determinePosition() async {
     bool serviceEnabled;
@@ -113,11 +116,18 @@ class MainController extends GetxController {
     locationPerm.value = true;
     myPosition.value =  await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     var posModel = PositionsModel(longitude: myPosition.value.longitude,latitude: myPosition.value.latitude);
-    if(appSettings.value.positions!.where((element) => element == posModel) == null){
+    if(appSettings.value.positions!.where((element) => element.latitude == posModel.latitude && element.longitude == posModel.longitude).isEmpty){
       appSettings.value.positions!.add(posModel);
       getAddressFromLatLong(posModel);
+      setSettings();
+      loadData.value = false;
+      loadData.refresh();
       await WeatherController.instance.getWeatherData();
     }
+  }
+
+  Future setSettings()async{
+    await settingsBox.write("app_settings", appSettings.toJson());
   }
 
   Future<void> getAddressFromLatLong(PositionsModel position)async {

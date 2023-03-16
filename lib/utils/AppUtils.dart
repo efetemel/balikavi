@@ -1,6 +1,11 @@
 import 'dart:math';
 
+import 'package:balikavi/controllers/MainController.dart';
 import 'package:balikavi/models/WeatherModelGfs.dart';
+import 'package:balikavi/views/FishView.dart';
+import 'package:balikavi/views/LocationView.dart';
+import 'package:balikavi/views/SettingsView.dart';
+import 'package:balikavi/views/WeatherView.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jiffy/jiffy.dart';
@@ -139,6 +144,11 @@ class AppUtils{
     }
   }
 
+  static IconButton getMenu(){
+    return IconButton(onPressed: (){
+      MainController.instance.scaffoldKey.value.currentState!.openDrawer();
+    },icon: Icon(Icons.menu));
+  }
 
 
 }
