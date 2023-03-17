@@ -16,6 +16,7 @@ class WeatherDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 400,
       width: double.infinity,
       alignment: Alignment.center,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

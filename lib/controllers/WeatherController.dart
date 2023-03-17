@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:balikavi/controllers/MainController.dart';
 import 'package:balikavi/models/PositionsModel.dart';
+import 'package:balikavi/models/SunSetAndRiseModel.dart';
 import 'package:balikavi/utils/AppUtils.dart';
 import 'package:balikavi/utils/Links.dart';
 import 'package:dio/dio.dart';
@@ -16,6 +17,7 @@ class WeatherController extends GetxController{
   static WeatherController instance = Get.find();
 
   var weatherModelGfs = <WeatherModelGfs>[].obs;
+  var sunSetRiseModel = <SunSetAndRiseModel>[].obs;
 
   var requestDate = DateTime.now().obs;
 
@@ -71,6 +73,10 @@ class WeatherController extends GetxController{
         var responseGfs = await MainController.instance.dio.post(Links.weatherApi,data: dataGfs);
         var responseGfsWave = await MainController.instance.dio.post(Links.weatherApi,data: dataGfsWave);
         var responsesConvData = WeatherModelGfs.fromJson(responseGfs.data);
+        var responseSunSetRise = await MainController.instance.dio.get(Links.sunSetRiseApi(element.latitude!,element.longitude!));
+        var responsed = SunSetAndRiseModel.fromJson(responseSunSetRise.data["results"]);
+        sunSetRiseModel.value.add(responsed);
+        sunSetRiseModel.refresh();
         weatherModelGfs.value.add(responsesConvData);
         weatherModelGfs.refresh();
       }

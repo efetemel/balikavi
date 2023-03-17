@@ -78,7 +78,64 @@ class AppUtils{
     }
     return response / todayWeathers.length;
   }
-  
+
+  static double todayLastWindU(WeatherModelGfs weatherModelGfs) {
+    var todayWeathers = <double>[];
+    var response = 0.0;
+
+    for (int i = 0; i <
+        weatherModelGfs.tempSurface!
+            .length; i++) {
+      var date = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![i]);
+      if(date.day == DateTime.now().day){
+        todayWeathers.add(weatherModelGfs.windUSurface![i]);
+      }
+    }
+    for (var element in todayWeathers) {
+      response += element;
+    }
+    return response / todayWeathers.length;
+  }
+  static double todayLastWindV(WeatherModelGfs weatherModelGfs) {
+    var todayWeathers = <double>[];
+    var response = 0.0;
+
+    for (int i = 0; i <
+        weatherModelGfs.tempSurface!
+            .length; i++) {
+      var date = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![i]);
+      if(date.day == DateTime.now().day){
+        todayWeathers.add(weatherModelGfs.windVSurface![i]);
+      }
+    }
+    for (var element in todayWeathers) {
+      response += element;
+    }
+    return response / todayWeathers.length;
+  }
+
+  static int todayLastPressure(WeatherModelGfs weatherModelGfs) {
+    var todayWeathers = <double>[];
+    var response = 0.0;
+    double standartBasincPa = 101325.0; // Standart atmosfer basıncı, Pa cinsinden
+
+    for (int i = 0; i <
+        weatherModelGfs.tempSurface!
+            .length; i++) {
+      var date = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![i]);
+      if(date.day == DateTime.now().day){
+        todayWeathers.add(weatherModelGfs.pressureSurface![i]);
+      }
+    }
+    for (var element in todayWeathers) {
+      response += element;
+    }
+    var h = response / todayWeathers.length;
+    double resPressure = (h / standartBasincPa) * 100.0; // Basıncın yüzdesi
+    return resPressure.floor();
+  }
+
+
   static int xtodayLastHumidity(WeatherModelGfs weatherModelGfs,int pos) {
     var todayWeathers = <double>[];
     var response = 0.0;
@@ -117,7 +174,7 @@ class AppUtils{
     for (var i =  0; i < weatherModelGfs.ts!.length.toInt(); i++) {
       var weatherDateTime = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![i]);
       var dateTimeNow = DateTime.now();
-      double rh =  weatherModelGfs.rhSurface![i];
+      var rh =  weatherModelGfs.rhSurface![i];
       if((weatherDateTime.day == dateTimeNow.day || weatherDateTime.day == dateTimeNow.day+1 )&& (weatherDateTime.month == dateTimeNow.month)){
         x.add( Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
@@ -132,7 +189,7 @@ class AppUtils{
                 children: [
                   Icon(Icons.water_drop,size: 12,),
                   SizedBox(width: 3),
-                  Text(rh.round().toString()+"%",style: TextStyle(color: Colors.grey),)
+                  Text("%${rh.round()}",style: TextStyle(color: Colors.grey),)
                 ],
               )
             ],
