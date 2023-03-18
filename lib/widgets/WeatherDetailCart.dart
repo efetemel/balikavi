@@ -24,61 +24,68 @@ class WeatherDetailCard extends StatelessWidget {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           color: AppUtils.boxNightColor),
-      child: ListView.builder(
-        itemCount: weatherModelGfs.tempSurface!.length,
-        itemBuilder: (_, int pos) {
-          var weatherDateTime =
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Hava Ayrıntıları",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17,color: Colors.grey),),
+          SizedBox(height: 5),
+          Expanded(child: ListView.builder(
+            itemCount: weatherModelGfs.tempSurface!.length,
+            itemBuilder: (_, int pos) {
+              var weatherDateTime =
               DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![pos]);
-          var dateTimeNow = DateTime.now();
-          if (!list.contains(Jiffy(weatherDateTime).yMMMMd)) {
-            x.value.add(weatherModelGfs);
-            double _celsius =
+              var dateTimeNow = DateTime.now();
+              if (!list.contains(Jiffy(weatherDateTime).yMMMMd)) {
+                x.value.add(weatherModelGfs);
+                double _celsius =
                 weatherModelGfs.tempSurface![pos];
-            list.add(Jiffy(weatherDateTime).yMMMMd.toString());
-            var dayName = "";
-            if (weatherDateTime.day == dateTimeNow.day) {
-              dayName = "Bugün";
-            } else if (weatherDateTime.day < dateTimeNow.day) {
-              dayName = "Dün";
-            } else {
-              dayName = Jiffy(weatherDateTime).EEEE;
-            }
-            return Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-              child:  Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width:70,
-                    child: Text(dayName,style: TextStyle(fontWeight: FontWeight.bold),),
+                list.add(Jiffy(weatherDateTime).yMMMMd.toString());
+                var dayName = "";
+                if (weatherDateTime.day == dateTimeNow.day) {
+                  dayName = "Bugün";
+                } else if (weatherDateTime.day < dateTimeNow.day) {
+                  dayName = "Dün";
+                } else {
+                  dayName = Jiffy(weatherDateTime).EEEE;
+                }
+                return Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                  child:  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        width:70,
+                        child: Text(dayName,style: TextStyle(fontWeight: FontWeight.bold),),
+                      ),
+                      Container(
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.water_drop,size: 20,),
+                            SizedBox(width: 10),
+                            Text("%${AppUtils.xtodayLastHumidity(weatherModelGfs,pos).toString()}",style: TextStyle(color: Colors.grey),),
+                            SizedBox(width: 10),
+                            getTypeWeather(weatherModelGfs.ptypeSurface![pos],iconSize: 30)
+                          ],
+                        ),
+                      ),
+                      Container(
+                          width: 40,
+                          child:Text("${AppUtils.getCelsiusText(_celsius)}",style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),)
+                      ),
+                    ],
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(Icons.water_drop,size: 20,),
-                        SizedBox(width: 10),
-                        Text("%${AppUtils.xtodayLastHumidity(weatherModelGfs,pos).toString()}",style: TextStyle(color: Colors.grey),),
-                        SizedBox(width: 10),
-                        getTypeWeather(weatherModelGfs.ptypeSurface![pos],iconSize: 30)
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 40,
-                    child:Text("${AppUtils.getCelsiusText(_celsius)}",style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),)
-                  ),
-                ],
-              ),
-            );
-          }
-          else{
-            return Container();
-          }
-        },
+                );
+              }
+              else{
+                return Container();
+              }
+            },
+          ))
+        ],
       ),
     );
   }

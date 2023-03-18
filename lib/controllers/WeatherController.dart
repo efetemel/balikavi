@@ -107,14 +107,14 @@ class WeatherController extends GetxController{
 
   Future addDBLatLong(PositionsModel positionsModel) async{
     if(MainController.instance.appSettings.value.positions!.contains(positionsModel) == false){
+      Get.back();
+      MainController.instance.loadData.value = false;
+      MainController.instance.loadData.refresh();
       MainController.instance.appSettings.value.positions!.add(positionsModel);
       MainController.instance.appSettings.refresh();
       MainController.instance.setSettings();
-      MainController.instance.loadData.value = false;
-      MainController.instance.loadData.refresh();
       MainController.instance.getAddressFromLatLong(positionsModel);
       await getWeatherData();
-      Get.back();
       AppUtils.showNotification("Yer ekleme", "Konum eklendi");
       searchResult.clear();
     }

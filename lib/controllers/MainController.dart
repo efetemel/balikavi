@@ -59,7 +59,8 @@ class MainController extends GetxController {
       for (var element in appSettings.value.positions!) {
         getAddressFromLatLong(element);
       }
-    }else{
+    }
+    else{
       var posModel =  PositionsModel.fromJson({
         "latitude":myPosition.value.latitude,
         "longitude":myPosition.value.longitude

@@ -23,7 +23,10 @@ class WeatherSunSetRiseCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
           color: AppUtils.boxNightColor),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text("Güneş",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17,color: Colors.grey),),
+          SizedBox(height: 5),
           ListTile(
             leading: Icon(Icons.sunny,size: 30,),
             title: Text("Gün Doğumu"),

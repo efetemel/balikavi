@@ -54,6 +54,7 @@ class WeatherView extends StatelessWidget {
             child: ListView.builder(
               itemCount: weatherController.weatherModelGfs.value.length,
               itemBuilder: (_, int pos) {
+                print(MainController.instance.placesData.value.length);
                 return WeatherCard(pos);
               },
             ),
