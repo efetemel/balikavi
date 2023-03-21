@@ -11,6 +11,7 @@ import 'package:balikavi/views/SearchView.dart';
 import 'package:balikavi/views/SettingsView.dart';
 import 'package:balikavi/views/SignInView.dart';
 import 'package:balikavi/views/WeatherView.dart';
+import 'package:balikavi/widgets/UserDrawHeaderWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
@@ -29,14 +30,7 @@ class HomeView extends StatelessWidget {
       drawer:Drawer(
         child: ListView(
           children: [
-            UserAccountsDrawerHeader(
-              accountName:Text("Efe Temel"),
-              accountEmail: Text("ersozyazilim@gmail.com"),
-              currentAccountPicture: CircleAvatar(backgroundColor: Colors.red,),
-              decoration: BoxDecoration(
-                  color: Colors.transparent
-              ),
-            ),
+            UserDrawHeaderWidget(),
             ListTile(
               leading: Icon(Icons.sunny),
               title: Text("Hava Durumu"),

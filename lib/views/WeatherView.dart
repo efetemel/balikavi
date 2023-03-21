@@ -23,7 +23,7 @@ class WeatherView extends StatelessWidget {
               scrolledUnderElevation: 0.0,
               backgroundColor: Colors.transparent ,
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(MainController.instance.mainText.value),
+                title: Text("Hava Durumu"),
                 centerTitle: true,
                 background: Container(
                   color: Colors.transparent,
@@ -49,12 +49,11 @@ class WeatherView extends StatelessWidget {
         body:Obx(
               () => RefreshIndicator(
             onRefresh: () async {
-              await weatherController.getWeatherData();
+              await weatherController.refreshWeatherData();
             },
             child: ListView.builder(
               itemCount: weatherController.weatherModelGfs.value.length,
               itemBuilder: (_, int pos) {
-                print(MainController.instance.placesData.value.length);
                 return WeatherCard(pos);
               },
             ),

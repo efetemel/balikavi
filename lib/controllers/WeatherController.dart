@@ -23,17 +23,73 @@ class WeatherController extends GetxController{
 
   var searchResult = RxList();
 
-  WeatherController(){
-  }
+  WeatherController();
 
-  Future getWeatherData()async{
-    try{
+  Future getWeatherData({PositionsModel? posModel})async{
+    if(posModel != null){
+      var baseData = {
+        "key": Links.weatherApiKey,
+        "lat": posModel.latitude,
+        "lon": posModel.longitude,
+        "levels": [
+          "surface",
+          "800h",
+          "300h",
+        ]
+      };
+      var dataGfs = {
+        ...baseData,
+        "model": "gfs",
+        "parameters": [
+          "wind",
+          "windGust",
+          "dewpoint",
+          "pressure",
+          "temp",
+          "precip",
+          "convPrecip",
+          "lclouds",
+          "mclouds",
+          "hclouds",
+          "ptype",
+          "cape",
+          "rh",
+          "gh"
+        ]
+      };
+      var dataGfsWave = {
+        ...baseData,
+        "model": "gfsWave",
+        "parameters": [
+          "waves",
+          "windWaves",
+          "swell1",
+          "swell2"
+        ]
+      };
+      var responseGfs = await MainController.instance.dio.post(Links.weatherApi,data: dataGfs);
+      var responseGfsWave = await MainController.instance.dio.post(Links.weatherApi,data: dataGfsWave);
+      var responsesConvData = WeatherModelGfs.fromJson(responseGfs.data);
+      var responseSunSetRise = await MainController.instance.dio.get(Links.sunSetRiseApi(posModel.latitude!,posModel.longitude!));
+      var responsed = SunSetAndRiseModel.fromJson(responseSunSetRise.data["results"]);
+      sunSetRiseModel.value.add(responsed);
+      sunSetRiseModel.refresh();
+      weatherModelGfs.value.add(responsesConvData);
+      weatherModelGfs.refresh();
+      requestDate.value = DateTime.now();
+      MainController.instance.loadData.value = true;
+      MainController.instance.loadData.refresh();
+
+    }
+    else{
       weatherModelGfs.clear();
-      for (var element in MainController.instance.appSettings.value.positions!) {
+      MainController.instance.loadData.value = false;
+      MainController.instance.loadData.refresh();
+      for (var posModel in MainController.instance.appSettings.value.positions!) {
         var baseData = {
           "key": Links.weatherApiKey,
-          "lat": element.latitude,
-          "lon": element.longitude,
+          "lat": posModel.latitude,
+          "lon": posModel.longitude,
           "levels": [
             "surface",
             "800h",
@@ -73,27 +129,73 @@ class WeatherController extends GetxController{
         var responseGfs = await MainController.instance.dio.post(Links.weatherApi,data: dataGfs);
         var responseGfsWave = await MainController.instance.dio.post(Links.weatherApi,data: dataGfsWave);
         var responsesConvData = WeatherModelGfs.fromJson(responseGfs.data);
-        var responseSunSetRise = await MainController.instance.dio.get(Links.sunSetRiseApi(element.latitude!,element.longitude!));
+        var responseSunSetRise = await MainController.instance.dio.get(Links.sunSetRiseApi(posModel.latitude!,posModel.longitude!));
         var responsed = SunSetAndRiseModel.fromJson(responseSunSetRise.data["results"]);
         sunSetRiseModel.value.add(responsed);
         sunSetRiseModel.refresh();
         weatherModelGfs.value.add(responsesConvData);
         weatherModelGfs.refresh();
+
       }
       requestDate.value = DateTime.now();
       MainController.instance.loadData.value = true;
       MainController.instance.loadData.refresh();
-    }catch(err){
-      if(err is DioError){
-        AppUtils.showNotification("Sistem bilgisi", "Konum veya İnternet açık değil!");
-      }
     }
-    if(requestDate.value.add(Duration(minutes: 30)) == DateTime.now()){
+  }
 
+  Future refreshWeatherData()async{
+    for (int i = 0; i < MainController.instance.appSettings.value.positions!.length;i++) {
+      var baseData = {
+        "key": Links.weatherApiKey,
+        "lat": MainController.instance.appSettings.value.positions![i].latitude,
+        "lon": MainController.instance.appSettings.value.positions![i].longitude,
+        "levels": [
+          "surface",
+          "800h",
+          "300h",
+        ]
+      };
+      var dataGfs = {
+        ...baseData,
+        "model": "gfs",
+        "parameters": [
+          "wind",
+          "windGust",
+          "dewpoint",
+          "pressure",
+          "temp",
+          "precip",
+          "convPrecip",
+          "lclouds",
+          "mclouds",
+          "hclouds",
+          "ptype",
+          "cape",
+          "rh",
+          "gh"
+        ]
+      };
+      var dataGfsWave = {
+        ...baseData,
+        "model": "gfsWave",
+        "parameters": [
+          "waves",
+          "windWaves",
+          "swell1",
+          "swell2"
+        ]
+      };
+      var responseGfs = await MainController.instance.dio.post(Links.weatherApi,data: dataGfs);
+      var responseGfsWave = await MainController.instance.dio.post(Links.weatherApi,data: dataGfsWave);
+      var responsesConvData = WeatherModelGfs.fromJson(responseGfs.data);
+      var responseSunSetRise = await MainController.instance.dio.get(Links.sunSetRiseApi(MainController.instance.appSettings.value.positions![i].latitude!,MainController.instance.appSettings.value.positions![i].longitude!));
+      var responsed = SunSetAndRiseModel.fromJson(responseSunSetRise.data["results"]);
+      weatherModelGfs.value[i] = responsesConvData;
+      sunSetRiseModel.value[i] = responsed;
+      sunSetRiseModel.refresh();
+      weatherModelGfs.refresh();
     }
-    else{
-      // 30 DAKİKA SONRA GEL
-    }
+
   }
 
   Future searchLocation(String query)async{
@@ -108,13 +210,11 @@ class WeatherController extends GetxController{
   Future addDBLatLong(PositionsModel positionsModel) async{
     if(MainController.instance.appSettings.value.positions!.contains(positionsModel) == false){
       Get.back();
-      MainController.instance.loadData.value = false;
-      MainController.instance.loadData.refresh();
       MainController.instance.appSettings.value.positions!.add(positionsModel);
       MainController.instance.appSettings.refresh();
       MainController.instance.setSettings();
       MainController.instance.getAddressFromLatLong(positionsModel);
-      await getWeatherData();
+      await getWeatherData(posModel: positionsModel);
       AppUtils.showNotification("Yer ekleme", "Konum eklendi");
       searchResult.clear();
     }

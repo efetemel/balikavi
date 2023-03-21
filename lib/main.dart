@@ -7,6 +7,7 @@ import 'package:balikavi/views/SignUpView.dart';
 import 'package:balikavi/views/WelcomeView.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:jiffy/jiffy.dart';
 
 import 'controllers/MainController.dart';

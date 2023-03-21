@@ -23,8 +23,6 @@ class MainController extends GetxController {
   var locationPerm = false.obs;
   final scaffoldKey = GlobalKey<ScaffoldState>().obs;
 
-  var mainText = "Hava Durumu".obs;
-
   var loadData = false.obs;
 
   var placesData = <Placemark>[].obs;
@@ -42,39 +40,57 @@ class MainController extends GetxController {
       isMocked: true
   ).obs;
 
-  MainController() {
+  MainController(){
     readSettings();
-    determinePosition().then((_){});
+    determinePosition();
   }
 
   Future readSettings() async{
     await GetStorage.init();
-    var response = await settingsBox.read("app_settings");
-    if(response != null){
-      appSettings.value = AppSettings.fromJson(response);
-      if(appSettings.value.token != null){
-        dio.options = BaseOptions(headers: {"Authorization":appSettings.value.token});
-        await UserController.instance.getSettings();
-      }
-      for (var element in appSettings.value.positions!) {
-        getAddressFromLatLong(element);
-      }
-    }
-    else{
-      var posModel =  PositionsModel.fromJson({
-        "latitude":myPosition.value.latitude,
-        "longitude":myPosition.value.longitude
-      });
-      appSettings.value = AppSettings(
-          firstOpen: false,
-          token: null,
-          positions:[posModel]
-      );
-      appSettings.refresh();
-      getAddressFromLatLong(posModel);
+    try{
+     var response = settingsBox.read("app_settings");
+     if(response != null){
+       appSettings.value = AppSettings.fromJson(response);
+       appSettings.refresh();
+       if(appSettings.value.token != null){
+         await UserController.instance.getSettings();
+         dio.options = BaseOptions(headers: {
+           "Authorization":appSettings.value.token
+         });
+         await UserController.instance.getSettings();
+
+       }
+       for (var element in appSettings.value.positions!) {
+         getAddressFromLatLong(element);
+       }
+       await WeatherController.instance.getWeatherData();
+     }
+     else{
+       var posModel =  PositionsModel.fromJson({
+         "latitude":myPosition.value.latitude,
+         "longitude":myPosition.value.longitude
+       });
+       appSettings.value = AppSettings(
+           firstOpen: false,
+           token: null,
+           positions:[posModel]
+       );
+       appSettings.refresh();
+       getAddressFromLatLong(posModel);
+       await setSettings();
+       await WeatherController.instance.getWeatherData(posModel:posModel);
+     }
+   }catch(err){
+     print(err);
+   }
+  }
+
+  Future setSettings()async{
+    try{
       await settingsBox.write("app_settings", appSettings.toJson());
+    }catch(err){
+      print(err);
     }
-    await WeatherController.instance.getWeatherData();
   }
 
   Future setToken(String token)async{
@@ -85,8 +101,13 @@ class MainController extends GetxController {
   Future clearToken()async{
     await settingsBox.write("token", null);
   }
-  
 
+  Future<void> getAddressFromLatLong(PositionsModel position)async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
+    Placemark place = placemarks[0];
+    placesData.value.add(place);
+    placesData.refresh();
+  }
 
   Future determinePosition() async {
     bool serviceEnabled;
@@ -119,22 +140,10 @@ class MainController extends GetxController {
     var posModel = PositionsModel(longitude: myPosition.value.longitude,latitude: myPosition.value.latitude);
     if(appSettings.value.positions!.where((element) => element.latitude == posModel.latitude && element.longitude == posModel.longitude).isEmpty){
       appSettings.value.positions!.add(posModel);
-      getAddressFromLatLong(posModel);
-      setSettings();
-      loadData.value = false;
-      loadData.refresh();
-      await WeatherController.instance.getWeatherData();
+      await getAddressFromLatLong(posModel);
+      await setSettings();
+      await WeatherController.instance.getWeatherData(posModel: posModel);
     }
   }
-
-  Future setSettings()async{
-    await settingsBox.write("app_settings", appSettings.toJson());
-  }
-
-  Future<void> getAddressFromLatLong(PositionsModel position)async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
-    Placemark place = placemarks[0];
-    placesData.value.add(place);
-    placesData.refresh();
-  }
+  
 }
