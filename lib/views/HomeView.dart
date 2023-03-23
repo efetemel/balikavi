@@ -14,6 +14,8 @@ import 'package:balikavi/views/WeatherView.dart';
 import 'package:balikavi/widgets/UserDrawHeaderWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/get_core.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:line_icons/line_icon.dart';
 import 'package:line_icons/line_icons.dart';
@@ -27,10 +29,10 @@ class HomeView extends StatelessWidget {
       extendBodyBehindAppBar: true,
       key: MainController.instance.scaffoldKey.value,
       body: Obx(()=> beforeInit()),
-      drawer:Drawer(
+      drawer:Obx(()=>Drawer(
         child: ListView(
           children: [
-            UserDrawHeaderWidget(),
+            UserController.instance.logged.value ?  UserDrawHeaderWidget() : SizedBox(height: 10,),
             ListTile(
               leading: Icon(Icons.sunny),
               title: Text("Hava Durumu"),
@@ -55,33 +57,24 @@ class HomeView extends StatelessWidget {
               leading: LineIcon.mapMarker(),
               title: Text("Konumlarım"),
               onTap: (){
-                if(MainController.instance.homeTabIndex.value != 2){
-                  MainController.instance.homeTabIndex.value = 2;
-                  MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
-                }
+                Get.to(()=>LocationView());
               },
             ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text("Ayarlar"),
               onTap: (){
-                if(MainController.instance.homeTabIndex.value != 3){
-                  MainController.instance.homeTabIndex.value = 3;
-                  MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
-                }
+                Get.to(()=>SettingsView());
               },
             ),
-            ListTile(
+            UserController.instance.logged.value ? ListTile(
               leading: Icon(Icons.person),
               title: Text("Hesabım"),
               onTap: (){
-                if(MainController.instance.homeTabIndex.value != 4){
-                  MainController.instance.homeTabIndex.value = 4;
-                  MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
-                }
+                Get.to(()=>ProfileView());
               },
-            ),
-            ListTile(
+            ) : Container(),
+            UserController.instance.logged.value ? ListTile(
               leading: Icon(Icons.message),
               title: Text("Mesajlar"),
               onTap: (){
@@ -90,17 +83,24 @@ class HomeView extends StatelessWidget {
                   MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
                 }
               },
-            ),
-            ListTile(
+            ) : Container(),
+            UserController.instance.logged.value ? ListTile(
               leading: Icon(Icons.logout),
               title: Text("Çıkış yap"),
-              onTap: (){
-                //exit
+              onTap: ()async{
+                await UserController.instance.logout();
               },
-            ),
+            ) : Container(),
+            UserController.instance.logged.value == false ? ListTile(
+              leading: Icon(Icons.login),
+              title: Text("Giriş yap"),
+              onTap: (){
+                Get.to(()=>SignInView());
+              },
+            ) : Container()
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -124,14 +124,6 @@ class HomeView extends StatelessWidget {
         return WeatherView();
       case 1:
         return FishView();
-      case 2:
-        return LocationView();
-      case 3:
-        return SettingsView();
-      case 4:
-        return ProfileView();
-      case 5:
-        return LocationView();
       default:
         return Container();
     }

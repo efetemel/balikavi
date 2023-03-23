@@ -23,6 +23,8 @@ class WeatherController extends GetxController{
 
   var searchResult = RxList();
 
+  var addedLoading = false.obs;
+
   WeatherController();
 
   Future getWeatherData({PositionsModel? posModel})async{
@@ -209,6 +211,8 @@ class WeatherController extends GetxController{
 
   Future addDBLatLong(PositionsModel positionsModel) async{
     if(MainController.instance.appSettings.value.positions!.contains(positionsModel) == false){
+      addedLoading.value = true;
+      addedLoading.refresh();
       Get.back();
       MainController.instance.appSettings.value.positions!.add(positionsModel);
       MainController.instance.appSettings.refresh();
@@ -217,6 +221,8 @@ class WeatherController extends GetxController{
       await getWeatherData(posModel: positionsModel);
       AppUtils.showNotification("Yer ekleme", "Konum eklendi");
       searchResult.clear();
+      addedLoading.value = false;
+      addedLoading.refresh();
     }
     else{
       AppUtils.showNotification("Yer ekleme", "Mevcut konum zaten ekli");

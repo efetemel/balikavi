@@ -8,9 +8,10 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      child:Obx(()=> SettingsList(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(backgroundColor: Colors.grey.shade900,elevation: 0.0,title: Text("Ayarlar"),),
+      body: Obx(()=> SettingsList(
         darkTheme: SettingsThemeData().copyWith(settingsListBackground: Colors.grey.shade900),
         applicationType: ApplicationType.both,
         sections: [

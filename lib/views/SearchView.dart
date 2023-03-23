@@ -21,12 +21,14 @@ class SearchView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Konum Ara"),
+        elevation: 0.0,
+        backgroundColor: Colors.transparent,
       ),
       body: SafeArea(
         child: Container(
           width: double.infinity,
           alignment: Alignment.center,
-          child: Column(
+          child: WeatherController.instance.addedLoading.value ? CircularProgressIndicator() :  Column(
             children: [
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 30,vertical: 20),
@@ -39,23 +41,17 @@ class SearchView extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(child: TextField(
-                      style: TextStyle(
-
-                      ),
                       controller: searchTextController,
+                      onSubmitted: (_)async{ await WeatherController.instance.searchLocation(searchTextController.text);
+                      },
                       decoration: InputDecoration(
                         suffixIcon:IconButton(onPressed: ()async{
                           await WeatherController.instance.searchLocation(searchTextController.text);
                         }, icon: Icon(Icons.search)),
-                        hintText: "Ülke, Şehir arama yap"
+                        hintText: "Ülke, Şehir arama yap",
                     ))),
                   ]
                 ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 1,
-                color: Colors.grey,
               ),
               Expanded(
                 child: Obx(()=>ListView.builder(

@@ -15,12 +15,13 @@ class UserController extends GetxController{
   static UserController instance = Get.find();
   static MainController mainController = Get.find();
   var user = UserModel().obs;
+  var logged = false.obs;
 
   Future signUp(SignUpModel signUpModel) async{
     try{
       var response = await mainController.dio.post(Links.myApiSignUp,data: signUpModel.toJson());
       AppUtils.showNotification("Kayıt Olma işlemi","Tebrikler kayıt oluşturuldu");
-      Get.offAll(()=>SignInView());
+      Get.back();
     }catch(err){
       if(err is DioError){
         AppUtils.showNotification("Kayıt Olma işlemi", err.response.toString());
@@ -35,6 +36,7 @@ class UserController extends GetxController{
       MainController.instance.dio.options = BaseOptions(headers: {"Authorization":response.data["token"]});
       await getSettings();
     }catch(err){
+      print(err);
       if(err is DioError){
         AppUtils.showNotification("Giriş yapma işlemi", err.response.toString());
       }
@@ -45,13 +47,30 @@ class UserController extends GetxController{
     try{
       var response = await mainController.dio.get(Links.myApiGetSettings);
       user.value =  UserModel.fromJson(response.data);
-      Get.offAll(()=>{HomeView()});
+      user.refresh();
+      logged.value = true;
+      logged.refresh();
+      MainController.instance.homeTabIndex.value = 0;
+      MainController.instance.homeTabIndex.refresh();
+      Get.back();
+      MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
+      AppUtils.showNotification("Hoşgeldiniz!","Sayın ${user.value.userName}");
     }catch(err){
       if(err is DioError){
         MainController.instance.clearToken();
-
+        logged.value = false;
+        logged.refresh();
       }
     }
+  }
+
+  Future logout()async{
+    user.value = UserModel();
+    user.refresh();
+    logged.value = false;
+    logged.refresh();
+    MainController.instance.homeTabIndex.value = 0;
+    MainController.instance.homeTabIndex.refresh();
   }
 
 

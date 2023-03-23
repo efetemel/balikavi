@@ -18,7 +18,8 @@ class LocationView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Konumlarım"),
-        leading: AppUtils.getMenu(),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
         actions: [
           IconButton(onPressed: (){
             Get.to(()=>SearchView());
