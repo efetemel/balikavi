@@ -1,3 +1,4 @@
+import 'package:balikavi/controllers/SocketController.dart';
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/utils/AppUtils.dart';
@@ -14,6 +15,7 @@ import 'controllers/MainController.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  Get.put(SocketController());
   Get.put(MainController());
   Get.put(WeatherController());
   Get.put(UserController());
