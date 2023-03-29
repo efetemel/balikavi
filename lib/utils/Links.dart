@@ -10,9 +10,10 @@ class Links{
   static const String googleKey = "AIzaSyApncc23YVI2NxidQcRC7F-8gAHQ1EKMRM";
   static const String googleSearchApi = "https://maps.googleapis.com/maps/api/geocode/json?key=$googleKey&address=";
 
-  static const String _myApi = "http://192.168.11.1:3001/api";
+  static const String socketApi = "http://192.168.1.100:3001";
+  static const String myApi = "http://192.168.1.100:3001/api";
   static const String _myApiAuthPrefix = "/auth/";
-  static const String myApiSignUp = "$_myApi${_myApiAuthPrefix}signUp";
-  static const String myApiSignIn = "$_myApi${_myApiAuthPrefix}signIn";
-  static const String myApiGetSettings = "$_myApi${_myApiAuthPrefix}getSettings";
+  static const String myApiSignUp = "$myApi${_myApiAuthPrefix}signUp";
+  static const String myApiSignIn = "$myApi${_myApiAuthPrefix}signIn";
+  static const String myApiGetSettings = "$myApi${_myApiAuthPrefix}getSettings";
 }

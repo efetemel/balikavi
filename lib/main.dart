@@ -1,4 +1,3 @@
-import 'package:balikavi/controllers/SocketController.dart';
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/utils/AppUtils.dart';
@@ -11,15 +10,21 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:jiffy/jiffy.dart';
 
-import 'controllers/MainController.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+// ...
+
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  Get.put(SocketController());
-  Get.put(MainController());
-  Get.put(WeatherController());
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   Get.put(UserController());
+  Get.put(WeatherController());
   await Jiffy.locale(AppUtils.appLanguageShort);
+
   runApp(const MyApp());
 }
 

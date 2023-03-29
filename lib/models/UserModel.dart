@@ -4,13 +4,17 @@ class UserModel {
   String? profilePhoto;
   String? birthDate;
   String? description;
+  List? friends;
+  List? blocks;
+  List? latitude;
+  List? longitude;
 
   UserModel(
       {this.email,
         this.userName,
         this.profilePhoto,
         this.description,
-        this.birthDate});
+        this.birthDate,this.friends,this.blocks,this.latitude,this.longitude});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     email = json['email'];
@@ -18,6 +22,10 @@ class UserModel {
     profilePhoto = json['profilePhoto'];
     birthDate = json['birthDate'];
     description = json['description'];
+    friends = json['friends'];
+    blocks = json['blocks'];
+    latitude = json['latitude'];
+    longitude = json['longitude'];
   }
 
   Map<String, dynamic> toJson() {
@@ -27,6 +35,10 @@ class UserModel {
     data['profilePhoto'] = this.profilePhoto;
     data['birthDate'] = this.birthDate;
     data['description'] = this.description;
+    data['friends'] = this.friends;
+    data['blocks'] = this.blocks;
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
     return data;
   }
 }

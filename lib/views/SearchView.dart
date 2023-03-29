@@ -17,7 +17,6 @@ class SearchView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(MainController.instance.appSettings.value.positions!.length);
     return Scaffold(
       appBar: AppBar(
         title: Text("Konum Ara"),

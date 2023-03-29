@@ -25,7 +25,8 @@ class SignUpView extends StatelessWidget {
           "password":passwordController.text.trim(),
           "userName":userNameController.text.trim(),
           "profilePhoto":"default",
-          "birthDate":birthDatePicker.value.toString()
+          "birthDate":birthDatePicker.value.toString(),
+          "description":"beni bilen bilir"
         });
         UserController.instance.signUp(signUpModel);
       }

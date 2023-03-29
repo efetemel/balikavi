@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "15150088271",
+    "project_id": "balikavi-431f9",
+    "storage_bucket": "balikavi-431f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15150088271:android:4749fd5dc42ca46aa6ea3a",
+        "android_client_info": {
+          "package_name": "com.balikavi.balikavi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "15150088271-l3g2uea6p31dpioo2c4r0pngi929fo84.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLgFFao__ZtWlQjlxI4YaUFb3wNF5qIvM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15150088271-l3g2uea6p31dpioo2c4r0pngi929fo84.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
