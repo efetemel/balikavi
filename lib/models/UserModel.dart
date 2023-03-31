@@ -1,3 +1,5 @@
+import 'package:balikavi/models/PositionsModel.dart';
+
 class UserModel {
   String? email;
   String? userName;
@@ -6,15 +8,14 @@ class UserModel {
   String? description;
   List? friends;
   List? blocks;
-  List? latitude;
-  List? longitude;
+  List<PositionsModel>? positions;
 
   UserModel(
       {this.email,
         this.userName,
         this.profilePhoto,
         this.description,
-        this.birthDate,this.friends,this.blocks,this.latitude,this.longitude});
+        this.birthDate,this.friends,this.blocks,this.positions});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     email = json['email'];
@@ -24,9 +25,14 @@ class UserModel {
     description = json['description'];
     friends = json['friends'];
     blocks = json['blocks'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
+    List<PositionsModel> posList = [];
+    var x = json["positions"] as List;
+    x.forEach((element) {
+      posList.add(PositionsModel(latitude: element[0],longitude: element[1]));
+    });
+    positions = posList;
   }
+
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -35,10 +41,22 @@ class UserModel {
     data['profilePhoto'] = this.profilePhoto;
     data['birthDate'] = this.birthDate;
     data['description'] = this.description;
-    data['friends'] = this.friends;
-    data['blocks'] = this.blocks;
-    data['latitude'] = this.latitude;
-    data['longitude'] = this.longitude;
+    if(this.friends != null) {
+      data['friends'] = this.friends;
+    } else {
+      data['friends'] = [];
+    }
+    if(this.blocks != null) {
+      data['blocks'] = this.blocks;
+    }
+    else{
+      data["blocks"] = [];
+    }
+    try{
+      data['positions'] = this.positions as List<PositionsModel>;
+    }catch(err){
+      data['positions'] = this.positions;
+    }
     return data;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:balikavi/controllers/MainController.dart';
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/utils/AppUtils.dart';
@@ -21,6 +22,7 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  Get.put(MainController());
   Get.put(UserController());
   Get.put(WeatherController());
   await Jiffy.locale(AppUtils.appLanguageShort);

@@ -22,6 +22,11 @@ class LocationView extends StatelessWidget {
         elevation: 0.0,
         actions: [
           IconButton(onPressed: (){
+            MainController.instance.determinePosition();
+            Get.back();
+            MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
+          }, icon:Icon(Icons.my_location)),
+          IconButton(onPressed: (){
             Get.to(()=>SearchView());
           }, icon: Icon(Icons.add))
         ],
@@ -44,6 +49,7 @@ class LocationView extends StatelessWidget {
                   confirm: ElevatedButton(onPressed: ()async{
                     await WeatherController.instance.dellDbLatLong(pos,position,placesData);
                     Get.back(closeOverlays: true);
+                    MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
                   }, child: Text("Sil")),
                   cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
                 );

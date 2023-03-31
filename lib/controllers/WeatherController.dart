@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:balikavi/controllers/MainController.dart';
+import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/models/PositionsModel.dart';
 import 'package:balikavi/models/SunSetAndRiseModel.dart';
 import 'package:balikavi/utils/AppUtils.dart';
@@ -143,6 +144,8 @@ class WeatherController extends GetxController{
       MainController.instance.loadData.value = true;
       MainController.instance.loadData.refresh();
     }
+    MainController.instance.loading.value = false;
+    MainController.instance.loading.refresh();
   }
 
   Future refreshWeatherData()async{
@@ -218,6 +221,9 @@ class WeatherController extends GetxController{
       MainController.instance.appSettings.refresh();
       MainController.instance.setSettings();
       MainController.instance.getAddressFromLatLong(positionsModel);
+      if(UserController.instance.logged.value){
+        await UserController.instance.reloadPositions();
+      }
       await getWeatherData(posModel: positionsModel);
       AppUtils.showNotification("Yer ekleme", "Konum eklendi");
       searchResult.clear();
@@ -237,6 +243,9 @@ class WeatherController extends GetxController{
     MainController.instance.placesData.refresh();
     MainController.instance.appSettings.refresh();
     MainController.instance.setSettings();
+    if(UserController.instance.logged.value){
+      await UserController.instance.reloadPositions();
+    }
     AppUtils.showNotification("Yer silme", "Konum Silindi");
   }
 

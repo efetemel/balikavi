@@ -1,3 +1,4 @@
+import 'package:balikavi/controllers/MainController.dart';
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/models/AppSettings.dart';
 import 'package:balikavi/models/SignUpModel.dart';
@@ -26,9 +27,10 @@ class SignUpView extends StatelessWidget {
           "userName":userNameController.text.trim(),
           "profilePhoto":"default",
           "birthDate":birthDatePicker.value.toString(),
-          "description":"beni bilen bilir"
+          "description":"beni bilen bilir",
+          "positions":MainController.instance.appSettings.value.positions!
         });
-        UserController.instance.signUp(signUpModel);
+        UserController.instance.registerWithEmailAndPassword(signUpModel);
       }
       else{
         AppUtils.showNotification("Kayıt olma işlemi", "Gerekli alanları doldurunuz!");

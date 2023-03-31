@@ -17,7 +17,7 @@ class SignInView extends StatelessWidget {
 
   void handleSignIn(){
     if(emailOrUserNameController.text.trim().isNotEmpty && passwordController.text.trim().isNotEmpty){
-      UserController.instance.signIn(SignInModel(email: emailOrUserNameController.text.trim(),password: passwordController.text.trim()));
+      UserController.instance.signInWithEmailAndPassword(SignInModel(email: emailOrUserNameController.text.trim(),password: passwordController.text.trim()));
     }
     else{
       AppUtils.showNotification("Giriş yapma işlemi", "Gerekli alanları doldurunuz!");
