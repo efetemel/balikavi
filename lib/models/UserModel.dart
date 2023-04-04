@@ -8,6 +8,7 @@ class UserModel {
   String? description;
   List? friends;
   List? blocks;
+  List? requests;
   List<PositionsModel>? positions;
 
   UserModel(
@@ -15,7 +16,7 @@ class UserModel {
         this.userName,
         this.profilePhoto,
         this.description,
-        this.birthDate,this.friends,this.blocks,this.positions});
+        this.birthDate,this.friends,this.blocks,this.positions,this.requests});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     email = json['email'];
@@ -25,6 +26,7 @@ class UserModel {
     description = json['description'];
     friends = json['friends'];
     blocks = json['blocks'];
+    requests = json['requests'];
     List<PositionsModel> posList = [];
     var x = json["positions"] as List;
     x.forEach((element) {
@@ -41,6 +43,7 @@ class UserModel {
     data['profilePhoto'] = this.profilePhoto;
     data['birthDate'] = this.birthDate;
     data['description'] = this.description;
+    data['requests'] = this.requests;
     if(this.friends != null) {
       data['friends'] = this.friends;
     } else {

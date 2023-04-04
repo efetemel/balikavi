@@ -1,4 +1,5 @@
 import 'package:balikavi/models/AppSettings.dart';
+import 'package:balikavi/models/FriendModel.dart';
 import 'package:balikavi/models/SignUpModel.dart';
 import 'package:balikavi/models/UserModel.dart';
 import 'package:balikavi/utils/AppUtils.dart';
@@ -19,6 +20,11 @@ class UserController extends GetxController{
   var user = UserModel().obs;
   var logged = false.obs;
   final _authService = AuthService();
+
+  RxList<FriendModel> requestFriendList = <FriendModel>[].obs;
+  var friendUserList = <FriendModel>[].obs;
+
+  var searchedUserList = <FriendModel>[].obs;
 
   Rx<User?> firebaseUser = Rx<User?>(null);
 
@@ -44,6 +50,23 @@ class UserController extends GetxController{
 
   Future reloadPositions()async{
     await _authService.reloadPositions();
+  }
+
+  Future acceptFriendRequest(String userId)async{
+    await _authService.acceptFriendRequest(userId);
+  }
+
+  Future declineFriendRequest(String userId)async{
+    await _authService.declineFriendRequest(userId);
+  }
+
+  Future deleteFriend(String userId)async{
+    await _authService.deleteFriend(userId);
+  }
+
+  Future refreshProfileView()async{
+    await _authService.getFriendList();
+    await _authService.getFriendRequestList();
   }
 
   // Giriş yap
@@ -76,6 +99,20 @@ class UserController extends GetxController{
       Get.snackbar("Kayıt işlemi", "Hoşgeldiniz, Sayın ${user.value.userName}",
           snackPosition: SnackPosition.TOP);
     }
+  }
+
+  Future searchUser(String userName)async{
+    try{
+      var searchedUser = await _authService.searchUser(userName);
+      searchedUserList.value = searchedUser;
+      searchedUserList.refresh();
+    }catch(err){
+      print(err);
+    }
+  }
+
+  Future sendFriendRequest(String userId)async{
+    await _authService.sendFriendRequest(userId);
   }
 
   Future signOut()async{

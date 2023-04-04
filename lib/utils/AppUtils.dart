@@ -170,10 +170,10 @@ class AppUtils{
 
 
   static List<Widget> hoursWeatherWidgets(WeatherModelGfs weatherModelGfs){
+    var dateTimeNow = DateTime.now();
     List<Widget> x = [];
     for (var i =  0; i < weatherModelGfs.ts!.length.toInt(); i++) {
       var weatherDateTime = DateTime.fromMillisecondsSinceEpoch(weatherModelGfs.ts![i]);
-      var dateTimeNow = DateTime.now();
       var rh =  weatherModelGfs.rhSurface![i];
       if((weatherDateTime.day == dateTimeNow.day || weatherDateTime.day == dateTimeNow.day+1 )&& (weatherDateTime.month == dateTimeNow.month)){
         x.add( Container(

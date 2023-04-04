@@ -141,6 +141,7 @@ class WeatherController extends GetxController{
 
       }
       requestDate.value = DateTime.now();
+      requestDate.refresh();
       MainController.instance.loadData.value = true;
       MainController.instance.loadData.refresh();
     }
@@ -199,6 +200,8 @@ class WeatherController extends GetxController{
       sunSetRiseModel.value[i] = responsed;
       sunSetRiseModel.refresh();
       weatherModelGfs.refresh();
+      requestDate.value = DateTime.now();
+      requestDate.refresh();
     }
 
   }
