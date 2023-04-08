@@ -11,9 +11,10 @@ class AddFriendView extends StatelessWidget {
   var searchTextController = TextEditingController();
   AddFriendView(){
     searchTextController.clear();
-    UserController.instance.searchedUserList.value = <FriendModel>[];
-    UserController.instance.searchedUserList.refresh();
+    UserController.instance.searchedFriends.value = [];
+    UserController.instance.searchedFriends.refresh();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +45,7 @@ class AddFriendView extends StatelessWidget {
                           },
                           decoration: InputDecoration(
                             suffixIcon:IconButton(onPressed: ()async{
-                              await UserController.instance.searchUser(searchTextController.text);
+                              await UserController.instance.searchFriends(searchTextController);
                             }, icon: Icon(Icons.search)),
                             hintText: "Kullcını adı arama yap",
                           ))),
@@ -53,15 +54,15 @@ class AddFriendView extends StatelessWidget {
               ),
               Expanded(
                 child: Obx(()=>ListView.builder(
-                  itemCount: UserController.instance.searchedUserList.value.length,
+                  itemCount: UserController.instance.searchedFriends.value.length,
                   itemBuilder: (_,int pos){
                     return ListTile(
-                      leading: CircleAvatar(child: Text(UserController.instance.searchedUserList.value[pos].userName!.substring(0,1).toUpperCase())),
-                      title: Text(UserController.instance.searchedUserList.value[pos].userName!),
-                      subtitle: Text(UserController.instance.searchedUserList.value[pos].description!),
+                      leading: CircleAvatar(child: Text(UserController.instance.searchedUserList[pos].userName!.substring(0,1).toUpperCase())),
+                      title: Text(UserController.instance.searchedUserList[pos].userName!),
                       trailing: const Text("İstek gönder"),
                       onTap: ()async{
-                        await UserController.instance.sendFriendRequest(UserController.instance.searchedUserList[pos].userId!);
+                        await UserController.instance.addFriendAddPending(UserController.instance.searchedUserList[pos].userId!);
+                       // await UserController.instance.sendFriendRequest(UserController.instance.searchedUserList[pos].userId!);
                       },
                     );
                   },

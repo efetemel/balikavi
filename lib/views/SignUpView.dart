@@ -30,7 +30,7 @@ class SignUpView extends StatelessWidget {
           "description":"beni bilen bilir",
           "positions":MainController.instance.appSettings.value.positions!
         });
-        UserController.instance.registerWithEmailAndPassword(signUpModel);
+        UserController.instance.signUp(signUpModel);
       }
       else{
         AppUtils.showNotification("Kayıt olma işlemi", "Gerekli alanları doldurunuz!");

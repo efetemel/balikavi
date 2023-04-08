@@ -88,7 +88,7 @@ class HomeView extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text("Çıkış yap"),
               onTap: ()async{
-                await UserController.instance.signOut();
+                await UserController.instance.logout();
               },
             ) : Container(),
             UserController.instance.logged.value == false ? ListTile(
