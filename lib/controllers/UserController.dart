@@ -366,13 +366,15 @@ class UserController extends GetxController{
     var response = await firestore.collection("users").doc(user.value!.uid).collection("messages").doc(messageId).get();
     response.reference.update({
       "message":"Bu mesaj silindi",
-      "enabled":false
+      "enabled":false,
+      "messageType":"Text"
     });
 
     var response1 = await firestore.collection("users").doc(receiverId).collection("messages").doc(messageId).get();
     response1.reference.update({
       "message":"Bu mesaj silindi",
-      "enabled":false
+      "enabled":false,
+      "messageType":"Text"
     });
 
     Get.back();

@@ -122,6 +122,8 @@ class MessageView extends StatelessWidget {
                                               child: Image.file(file),
                                             ),
                                             confirm: ElevatedButton(onPressed: ()async{
+                                              Get.back();
+                                              Get.back();
                                               await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, base64, "Image");
                                             }, child: Text("Gönder")),
                                             cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
@@ -130,6 +132,24 @@ class MessageView extends StatelessWidget {
                                       }, child: Text("Kamera")),
                                       ElevatedButton(onPressed: ()async{
                                         final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                                        if(image != null){
+                                          final filePath = image.path;
+                                          final file = File(filePath);
+                                          final bytes = await file.readAsBytes();
+                                          final base64 = base64Encode(bytes);
+                                          Get.defaultDialog(
+                                            title: "Medya Gönderimi",
+                                            content: Container(
+                                              child: Image.file(file),
+                                            ),
+                                            confirm: ElevatedButton(onPressed: ()async{
+                                              Get.back();
+                                              Get.back();
+                                              await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, base64, "Image");
+                                            }, child: Text("Gönder")),
+                                            cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
+                                          );
+                                        }
                                       }, child: Text("Galeri")),
                                     ],
                                   ),

@@ -84,19 +84,23 @@ class MyMessageBallon extends StatelessWidget {
       return Text(message.get("message"));
     }
     else if(message.get("messageType") == "Image" && imgLoad.value == false){
+      if(message.get("message") == "Bu mesaj silindi"){
+        return Text(message.get("message"));
+      }
       loadImage();
       return Container();
     }
     else if(message.get("messageType") == "Image" && imgLoad.value){
-     return Column(
-       children: [
-         Container(
-           width: 200,
-           child: Image.file(imgFile.value,fit: BoxFit.fitWidth),
-         ),
-         SizedBox(height: 10)
-       ],
-     );
+      return Column(
+        children: [
+          Container(
+            width: 200,
+            child: Image.file(imgFile.value,fit: BoxFit.fitWidth),
+          ),
+          SizedBox(height: 10)
+        ],
+      );
+
     }
     else{
       imgLoad.value = false;
@@ -107,14 +111,19 @@ class MyMessageBallon extends StatelessWidget {
   }
 
   Future loadImage()async{
-    final bytes = base64.decode(message.get("message"));
-    var path = await getTemporaryDirectory();
-    final tempFile = File('${path.path}/${message.id}.jpg');
-    await tempFile.writeAsBytes(bytes);
-    final file = File(tempFile.path);
-    imgLoad.value = true;
-    imgFile.value = file;
-    imgFile.refresh();
-    imgLoad.refresh();
+    try{
+      if(message.get("enabled")){}
+    }catch(err){
+      final bytes = base64.decode(message.get("message"));
+      var path = await getTemporaryDirectory();
+      final tempFile = File('${path.path}/${message.id}.jpg');
+      await tempFile.writeAsBytes(bytes);
+      final file = File(tempFile.path);
+      imgLoad.value = true;
+      imgFile.value = file;
+      imgFile.refresh();
+      imgLoad.refresh();
+    }
+
   }
 }
