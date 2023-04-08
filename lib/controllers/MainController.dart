@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/controllers/WeatherController.dart';
 import 'package:balikavi/models/PositionsModel.dart';
@@ -10,6 +12,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/AppSettings.dart';
 import '../utils/AppUtils.dart';

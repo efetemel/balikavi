@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:balikavi/controllers/UserController.dart';
 import 'package:balikavi/models/MessageModel.dart';
 import 'package:balikavi/widgets/MyMessageBallon.dart';
@@ -6,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jiffy/jiffy.dart';
 
 class MessageView extends StatelessWidget {
@@ -18,6 +22,7 @@ class MessageView extends StatelessWidget {
   }
 
   var messageText = TextEditingController();
+  var picker = ImagePicker();
 
 
   @override
@@ -72,8 +77,11 @@ class MessageView extends StatelessWidget {
                       }
                     },
                   );
-                }else{
-                  return CircularProgressIndicator();
+                }
+                else{
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
                 }
               },
             )),
@@ -91,11 +99,50 @@ class MessageView extends StatelessWidget {
                         messageText.clear();
                       },
                       decoration: InputDecoration(
-                          suffixIcon: IconButton(icon: Icon(Icons.send),onPressed: ()async{
-                            await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, messageText.text, "Text");
-                            messageText.clear();
+                          suffixIcon: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(onPressed: (){
+                                Get.defaultDialog(
+                                  title: "Medya gönderimi",
+                                  middleText: "Kaynak seçiniz",
+                                  content: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ElevatedButton(onPressed: ()async{
+                                        final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+                                        if(photo != null){
+                                          final filePath = photo.path;
+                                          final file = File(filePath);
+                                          final bytes = await file.readAsBytes();
+                                          final base64 = base64Encode(bytes);
+                                          Get.defaultDialog(
+                                            title: "Medya Gönderimi",
+                                            content: Container(
+                                              child: Image.file(file),
+                                            ),
+                                            confirm: ElevatedButton(onPressed: ()async{
+                                              await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, base64, "Image");
+                                            }, child: Text("Gönder")),
+                                            cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
+                                          );
+                                        }
+                                      }, child: Text("Kamera")),
+                                      ElevatedButton(onPressed: ()async{
+                                        final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                                      }, child: Text("Galeri")),
+                                    ],
+                                  ),
+                                  cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal"))
+                                );
+                              }, icon: Icon(Icons.attach_file)),
+                              IconButton(icon: Icon(Icons.send),onPressed: ()async{
+                                await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, messageText.text, "Text");
+                                messageText.clear();
 
-                          },),
+                              },),
+                            ],
+                          ),
                           contentPadding: EdgeInsets.symmetric(horizontal: 5)
                       ),
                     ),

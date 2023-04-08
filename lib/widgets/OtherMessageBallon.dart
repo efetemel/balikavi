@@ -14,7 +14,7 @@ class OtherMessageBallon extends StatelessWidget {
       children: [
         Container(
           decoration: const BoxDecoration(
-              color: Color.fromRGBO(68, 68, 68, 1),
+              color: Color.fromRGBO(100, 100, 100, 0.3),
               borderRadius: BorderRadius.only(topRight: Radius.circular(20),bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20))
           ),
           padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),

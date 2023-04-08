@@ -362,14 +362,18 @@ class UserController extends GetxController{
    }
   }
 
-  Future deleteMyMessage(String chatId,String messageId) async{
-    var response = await firestore.collection("messages").doc(chatId).collection("messages").doc(messageId).get();
-    var oldMessage = response.get("message");
+  Future deleteMyMessage(String messageId,String receiverId) async{
+    var response = await firestore.collection("users").doc(user.value!.uid).collection("messages").doc(messageId).get();
     response.reference.update({
       "message":"Bu mesaj silindi",
       "enabled":false
     });
 
+    var response1 = await firestore.collection("users").doc(receiverId).collection("messages").doc(messageId).get();
+    response1.reference.update({
+      "message":"Bu mesaj silindi",
+      "enabled":false
+    });
 
     Get.back();
   }
