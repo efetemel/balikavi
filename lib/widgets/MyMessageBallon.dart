@@ -11,8 +11,6 @@ class MyMessageBallon extends StatelessWidget {
   int pos;
   var message;
   DateTime toDate;
-  var imgLoad = false.obs;
-  var imgFile = File("").obs;
   MyMessageBallon(this.pos, this.message, this.toDate);
 
   @override
@@ -32,7 +30,12 @@ class MyMessageBallon extends StatelessWidget {
                title: "Mesaj işlemleri",
                middleText: "Mesajı silmek isediğine emin misin?",
                confirm: ElevatedButton(onPressed: (){
-                 UserController.instance.deleteMyMessage(message.id,message.get("receiverId"));
+                 if(message.get("messageType") == "Image"){
+                   UserController.instance.deleteMyImageMessage(message.id,message.get("receiverId"));
+                 }
+                 else{
+                   UserController.instance.deleteMyMessage(message.id,message.get("receiverId"));
+                 }
                }, child: Text("Evet")),
                cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
              );
@@ -49,13 +52,13 @@ class MyMessageBallon extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-               Obx(()=> messageType()),
+                UserController.instance.showMessageUseType(message),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(Jiffy(toDate).Hm),
                     SizedBox(width: 5),
-                    seenWidget()
+                    UserController.instance.seenMessageWiget(message)
                   ],
                 )
               ],
@@ -65,65 +68,7 @@ class MyMessageBallon extends StatelessWidget {
       ],
     );
   }
-  Widget seenWidget(){
-    try{
-      if(message.get("enabled") == false){
-        return Container();
-      }
-      return Container();
-    }catch(err){
-      return message.get("seen") == true ? Icon(Icons.done_all,size: 16,) : Icon(Icons.done,size: 16);
-    }
+ 
 
-  }
 
-  Widget messageType()  {
-    if(message.get("messageType") == "Text"){
-      imgLoad.value = false;
-      imgLoad.refresh();
-      return Text(message.get("message"));
-    }
-    else if(message.get("messageType") == "Image" && imgLoad.value == false){
-      if(message.get("message") == "Bu mesaj silindi"){
-        return Text(message.get("message"));
-      }
-      loadImage();
-      return Container();
-    }
-    else if(message.get("messageType") == "Image" && imgLoad.value){
-      return Column(
-        children: [
-          Container(
-            width: 200,
-            child: Image.file(imgFile.value,fit: BoxFit.fitWidth),
-          ),
-          SizedBox(height: 10)
-        ],
-      );
-
-    }
-    else{
-      imgLoad.value = false;
-      imgLoad.refresh();
-      return Container(height: 0,width: 0,);
-    }
-
-  }
-
-  Future loadImage()async{
-    try{
-      if(message.get("enabled")){}
-    }catch(err){
-      final bytes = base64.decode(message.get("message"));
-      var path = await getTemporaryDirectory();
-      final tempFile = File('${path.path}/${message.id}.jpg');
-      await tempFile.writeAsBytes(bytes);
-      final file = File(tempFile.path);
-      imgLoad.value = true;
-      imgFile.value = file;
-      imgFile.refresh();
-      imgLoad.refresh();
-    }
-
-  }
 }

@@ -40,7 +40,6 @@ class MessageView extends StatelessWidget {
           ],
         ),
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.more_horiz))
         ],
       ),
       body: Container(
@@ -114,8 +113,6 @@ class MessageView extends StatelessWidget {
                                         if(photo != null){
                                           final filePath = photo.path;
                                           final file = File(filePath);
-                                          final bytes = await file.readAsBytes();
-                                          final base64 = base64Encode(bytes);
                                           Get.defaultDialog(
                                             title: "Medya Gönderimi",
                                             content: Container(
@@ -124,7 +121,7 @@ class MessageView extends StatelessWidget {
                                             confirm: ElevatedButton(onPressed: ()async{
                                               Get.back();
                                               Get.back();
-                                              await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, base64, "Image");
+                                              await UserController.instance.sendImageMessage(UserController.instance.user.value!.uid, receiverId,file);
                                             }, child: Text("Gönder")),
                                             cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
                                           );
@@ -135,8 +132,6 @@ class MessageView extends StatelessWidget {
                                         if(image != null){
                                           final filePath = image.path;
                                           final file = File(filePath);
-                                          final bytes = await file.readAsBytes();
-                                          final base64 = base64Encode(bytes);
                                           Get.defaultDialog(
                                             title: "Medya Gönderimi",
                                             content: Container(
@@ -145,7 +140,7 @@ class MessageView extends StatelessWidget {
                                             confirm: ElevatedButton(onPressed: ()async{
                                               Get.back();
                                               Get.back();
-                                              await UserController.instance.sendMessage(UserController.instance.user.value!.uid, receiverId, base64, "Image");
+                                              await UserController.instance.sendImageMessage(UserController.instance.user.value!.uid, receiverId,file);
                                             }, child: Text("Gönder")),
                                             cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
                                           );

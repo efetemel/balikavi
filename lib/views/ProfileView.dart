@@ -38,6 +38,7 @@ class ProfileView extends StatelessWidget {
                   children: [
                     SizedBox(width: 20),
                     CircleAvatar(child: Text(UserController.instance.userModel.value.userName!.substring(0,1).toUpperCase()),),
+                    SizedBox(width: 10),
                     Text(UserController.instance.userModel.value.userName!),
                     SizedBox(width: 20),
                     Text(UserController.instance.userModel.value.description!),

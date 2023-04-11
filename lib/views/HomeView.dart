@@ -6,6 +6,7 @@ import 'package:balikavi/utils/AppUtils.dart';
 import 'package:balikavi/views/FishView.dart';
 import 'package:balikavi/views/LoadingView.dart';
 import 'package:balikavi/views/LocationView.dart';
+import 'package:balikavi/views/MessagesLisrView.dart';
 import 'package:balikavi/views/ProfileView.dart';
 import 'package:balikavi/views/SearchView.dart';
 import 'package:balikavi/views/SettingsView.dart';
@@ -78,10 +79,8 @@ class HomeView extends StatelessWidget {
               leading: Icon(Icons.message),
               title: Text("Mesajlar"),
               onTap: (){
-                if(MainController.instance.homeTabIndex.value != 5){
-                  MainController.instance.homeTabIndex.value = 5;
-                  MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
-                }
+                MainController.instance.scaffoldKey.value.currentState!.closeDrawer();
+                Get.to(()=>MessagesListView());
               },
             ) : Container(),
             UserController.instance.logged.value ? ListTile(

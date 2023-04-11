@@ -1,12 +1,20 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:balikavi/models/SignInModel.dart';
 import 'package:balikavi/models/SignUpModel.dart';
 import 'package:balikavi/utils/AppUtils.dart';
 import 'package:balikavi/views/SignUpView.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/FriendModel.dart';
 import '../models/UserModel.dart';
 import 'MainController.dart';
@@ -19,6 +27,8 @@ class UserController extends GetxController{
 
   FirebaseAuth auth = FirebaseAuth.instance;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  Reference storageRefImage = FirebaseStorage.instance.ref().child("images");
+
 
   late Rx<User?> user;
   Rx<UserModel> userModel = UserModel().obs;
@@ -76,6 +86,7 @@ class UserController extends GetxController{
         "readedInfo": event.get("readedInfo"),
         "positions":event.get("positions")
       });
+      userModel.refresh();
     });
   }
 
@@ -92,15 +103,19 @@ class UserController extends GetxController{
         var reqUser = await firestore.collection("users").doc(element).get();
         var x = FriendModel.fromJson(reqUser.data()!);
         x.userId = element;
-        friendList.value.add(x);
-        friendList.refresh();
+        if(friendList.value.where((element) => element.userId == x.userId).isEmpty){
+          friendList.value.add(x);
+          friendList.refresh();
+        }
       });
       myPendingId.forEach((element)async {
         var reqUser = await firestore.collection("users").doc(element).get();
         var x = FriendModel.fromJson(reqUser.data()!);
         x.userId = element;
-        pendingList.value.add(x);
-        pendingList.refresh();
+        if(pendingList.value.where((element) => element.userId == x.userId).isEmpty){
+          pendingList.value.add(x);
+          pendingList.refresh();
+        }
       });
       friendList.refresh();
       pendingList.refresh();
@@ -168,7 +183,7 @@ class UserController extends GetxController{
       }
       var response = await auth.createUserWithEmailAndPassword(email: signUpModel.email!, password: signUpModel.password!);
       Timestamp stamp = Timestamp.fromDate(DateTime.now());
-      firestore.collection("users").doc(response.user!.uid).set({
+      var data = {
         "userName":signUpModel.userName!,
         "email":signUpModel.email!,
         "lastSeen":true,
@@ -177,18 +192,36 @@ class UserController extends GetxController{
         "online":false,
         "readedInfo":true,
         "lastOnline":stamp.toString(),
-      });
-      firestore.collection("friends").doc(response.user!.uid).set({
         "blocks":[],
         "pending":[],
         "friends":[],
-      });
-    }catch(err){
+        "positions":[]
+      };
+      var usr  = UserModel.fromJson(data);
+       firestore.collection("users").doc(response.user!.uid).set(data).then((value)async{
+         firestore.collection("friends").doc(response.user!.uid).set({
+           "blocks":[],
+           "pending":[],
+           "friends":[],
+         });
+         Get.back();
+         Get.back();
+         logged.value = true;
+         logged.refresh();
+         userModel.value = usr;
+         userModel.refresh();
+         await online();
+         getUserAndSet();
+         getFriendsAndSet();
+         AppUtils.showNotification("Kayıt başarılı", "Hoşgeldin sayın, ${signUpModel.userName}");
+       });
 
+    }catch(err){
     }
   }
 
   Future logout() async{
+    userModel.value = UserModel();
     await auth.signOut();
   }
 
@@ -336,6 +369,34 @@ class UserController extends GetxController{
     //Get.to(()=>ChatView(receiverId, x.id));
   }
 
+  Future sendImageMessage(String senderId,String receiverId,File image)async{
+    messagesFriends.add(receiverId);
+    var date = DateTime.now();
+    var x = await firestore.collection("users").doc(user.value!.uid).collection("messages").add({
+      "receiverId":receiverId,
+      "senderId":senderId,
+      "message": "loading",
+      "messageType":"Image",
+      "sendTime":date,
+      "seen":false,
+      "forwarded":false
+    });
+    var sendMessage2 = await firestore.collection("users").doc(receiverId).collection("messages").doc(x.id).set({
+      "receiverId":receiverId,
+      "senderId":senderId,
+      "message": "loading",
+      "sendTime":date,
+      "messageType":"Image",
+      "seen":false,
+      "enabled":true,
+      "forwarded":false
+    });
+    final uploadTask = storageRefImage.child("${x.id}.jpg").putFile(image);
+    final url = await uploadTask.whenComplete(() => null).then((value) => value.ref.getDownloadURL());
+    await x.update({"message":url});
+    await firestore.collection("users").doc(receiverId).collection("messages").doc(x.id).update({"message":url});
+  }
+
   Future sendMessage(String senderId,String receiverId,String message,String messageType) async{
    if(message.trim().isNotEmpty && messageType.trim().isNotEmpty){
      messagesFriends.add(receiverId);
@@ -363,21 +424,32 @@ class UserController extends GetxController{
   }
 
   Future deleteMyMessage(String messageId,String receiverId) async{
-    var response = await firestore.collection("users").doc(user.value!.uid).collection("messages").doc(messageId).get();
-    response.reference.update({
-      "message":"Bu mesaj silindi",
-      "enabled":false,
-      "messageType":"Text"
-    });
-
-    var response1 = await firestore.collection("users").doc(receiverId).collection("messages").doc(messageId).get();
-    response1.reference.update({
-      "message":"Bu mesaj silindi",
-      "enabled":false,
-      "messageType":"Text"
-    });
-
     Get.back();
+    var response = await firestore.collection("users").doc(user.value!.uid).collection("messages").doc(messageId).get();
+    var response1 = await firestore.collection("users").doc(receiverId).collection("messages").doc(messageId).get();
+    var sendedData = {
+      "message":"Bu mesaj silindi",
+      "enabled":false,
+      "messageType":"Text"
+    };
+    response.reference.update(sendedData);
+    response1.reference.update(sendedData);
+  }
+
+  Future deleteMyImageMessage(String messageId,String receiverId)async{
+    Get.back();
+    var response = await firestore.collection("users").doc(user.value!.uid).collection("messages").doc(messageId).get();
+    var response1 = await firestore.collection("users").doc(receiverId).collection("messages").doc(messageId).get();
+    var sendedData = {
+      "message":"Bu mesaj silindi",
+      "enabled":false,
+      "messageType":"Text"
+    };
+    var imgPath = "${response.id}.jpg";
+    var img = storageRefImage.child(imgPath);
+    await img.delete();
+    response.reference.update(sendedData);
+    response1.reference.update(sendedData);
   }
 
   Future checkPositions()async{
@@ -428,6 +500,92 @@ class UserController extends GetxController{
     });
     Get.back();
     AppUtils.showNotification("Arkadaş işlemleri", "Arkadaş isteği silindi.");
+  }
+
+  Widget showMessageUseType(dynamic message)  {
+    if(message.get("message") == "loading"){
+      return Container();
+    }
+    switch(message.get("messageType")){
+      case "Text":
+        return Text(message.get("message"));
+      case "Image":
+        if(message.get("receiverId") == user.value!.uid){
+          return InkWell(
+            onTap: (){
+              Get.defaultDialog(
+                title: "Medya kaydetme",
+                middleText: "Medyayı kaydetmek istiyor musunuz?",
+                confirm: ElevatedButton(onPressed: ()async{
+                  Get.back();
+                  var response = await MainController.instance.dio.get(message.get("message"), options: Options(responseType: ResponseType.bytes));
+                  final result = await ImageGallerySaver.saveImage(
+                      Uint8List.fromList(response.data),
+                      quality: 100);
+                  AppUtils.showNotification("Resim kaydetme", "Resim kaydedildi");
+                }, child: Text("Kaydet")),
+                cancel: ElevatedButton(onPressed: (){Get.back();}, child: Text("İptal")),
+              );
+            },
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: message.get("message"),
+                  placeholder: (context, url) => Container(alignment: Alignment.center,child: CircularProgressIndicator(),),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  fit: BoxFit.cover,
+                  width: 250,
+                ),
+                SizedBox(height: 5)
+              ],
+            ),
+          );
+        }
+        return  Column(
+          children: [
+            CachedNetworkImage(
+              imageUrl: message.get("message"),
+              placeholder: (context, url) => Container(alignment: Alignment.center,child: CircularProgressIndicator(),),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+              fit: BoxFit.cover,
+              width: 250,
+            ),
+            SizedBox(height: 5)
+          ],
+        );
+      case "Emoji":
+        return Text(message.get("message"));
+      default:
+        return Container();
+    }
+  }
+
+  Widget seenMessageWiget(dynamic message){
+    try{
+      if(message.get("enabled") == false){
+        return Container();
+      }
+      return Container();
+    }catch(err){
+      return message.get("seen") == true ? Icon(Icons.done_all,size: 16,) : Icon(Icons.done,size: 16);
+    }
+
+  }
+
+  Widget showLastMessageType(dynamic message){
+    switch(message.get("messageType")){
+      case "Text":
+        return Text("${message.get("senderId") == user.value!.uid ? "Siz:" : ""}${message.get("message")}");
+      case "Image":
+        return Row(
+          children: [
+            message.get("senderId") == user.value!.uid ? Text("Siz: ") : Container(),
+            Icon(Icons.image)
+          ],
+        );
+      default:
+        return Container();
+    }
   }
 
 }

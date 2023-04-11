@@ -51,34 +51,36 @@ class MainController extends GetxController {
 
   Future readSettings() async{
     await GetStorage.init();
+
     try{
-     var response = settingsBox.read("app_settings");
-     if(response != null){
-       appSettings.value = AppSettings.fromJson(response);
-       appSettings.refresh();
-       for (var element in appSettings.value.positions!) {
-         getAddressFromLatLong(element);
-       }
-       await WeatherController.instance.getWeatherData();
-       await UserController.instance.checkPositions();
-     }
-     else{
-       var posModel =  PositionsModel.fromJson({
-         "latitude":myPosition.value.latitude,
-         "longitude":myPosition.value.longitude
-       });
-       appSettings.value = AppSettings(
-           firstOpen: false,
-           positions:[posModel]
-       );
-       appSettings.refresh();
-       getAddressFromLatLong(posModel);
-       await setSettings();
-       await UserController.instance.checkPositions();
-       await WeatherController.instance.getWeatherData(posModel:posModel);
-     }
+      var response = settingsBox.read("app_settings");
+      if(response != null){
+        appSettings.value = AppSettings.fromJson(response);
+        appSettings.refresh();
+        for (var element in appSettings.value.positions!) {
+          getAddressFromLatLong(element);
+        }
+        await WeatherController.instance.getWeatherData();
+        await UserController.instance.checkPositions();
+      }
+      else{
+        var posModel =  PositionsModel.fromJson({
+          "latitude":myPosition.value.latitude,
+          "longitude":myPosition.value.longitude
+        });
+        appSettings.value = AppSettings(
+            firstOpen: false,
+            positions:[posModel]
+        );
+        appSettings.refresh();
+        getAddressFromLatLong(posModel);
+        await setSettings();
+        if(UserController.instance.logged.value){
+          await UserController.instance.checkPositions();
+        }
+        await WeatherController.instance.getWeatherData(posModel:posModel);
+      }
    }catch(err){
-     print(err);
    }
   }
 
@@ -86,15 +88,18 @@ class MainController extends GetxController {
     try{
       await settingsBox.write("app_settings", appSettings.toJson());
     }catch(err){
-      print(err);
     }
   }
 
   Future<void> getAddressFromLatLong(PositionsModel position)async {
-    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
-    Placemark place = placemarks[0];
-    placesData.value.add(place);
-    placesData.refresh();
+    try{
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude!, position.longitude!);
+      Placemark place = placemarks[0];
+      placesData.value.add(place);
+      placesData.refresh();
+    }catch(err){
+    }
+
   }
 
   Future determinePosition() async {
@@ -134,7 +139,9 @@ class MainController extends GetxController {
       appSettings.refresh();
       await getAddressFromLatLong(posModel);
       await setSettings();
-      await UserController.instance.checkPositions();
+      if(UserController.instance.logged.value){
+        await UserController.instance.checkPositions();
+      }
       await WeatherController.instance.getWeatherData(posModel: posModel);
     }
   }
